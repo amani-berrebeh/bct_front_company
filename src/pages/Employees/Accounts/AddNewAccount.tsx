@@ -37,7 +37,10 @@ const AddNewAccount = () => {
     dateOfBirth: "",
     legalcard: "",
     username: "",
-    group: "",
+    groupId: {
+      _id:"",
+      groupName:""
+    },
     login: "",
     password: "",
     photosBase64String:"",
@@ -45,7 +48,8 @@ const AddNewAccount = () => {
     legalcardBase64String:"",
     legalcardExtension:"",
     positionTitle:"",
-    nationality:""
+    nationality:"",
+    status:""
   });
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({
@@ -101,7 +105,7 @@ const AddNewAccount = () => {
     formData["gender"] = selectedOption;
     formData["civilStatus"]= selectedStatus;
     formData["station"]= selectedStation;
-    formData["group"]= selectedGroup;
+    formData["groupId"].groupName! = selectedGroup
     formData["nationality"]= seletedCountry1.countryName;
     // formData["dateOfBirth"] = selectedDate!.toDateString();
     e.preventDefault();
@@ -250,11 +254,12 @@ const AddNewAccount = () => {
                                   className="mb-0"
                                   data-bs-toggle="tooltip"
                                   data-bs-placement="right"
-                                  title="Select Student Picture"
+                                  title="Select Employee Picture"
                                 >
                                   <span className="avatar-xs d-inline-block">
                                     <span className="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
                                       <i className="ri-image-fill"></i>
+                                      
                                     </span>
                                   </span>
                                 </label>
@@ -269,7 +274,7 @@ const AddNewAccount = () => {
                               </div>
                               <div className="avatar-xl">
                                 <div className="avatar-title bg-light rounded-4">
-                                  <img
+                                  <img 
                                     src={`data:image/*;base64, ${formData.photosBase64String}`}
                                     // alt={formData.firstName}
                                     id="photosBase64String"
@@ -314,7 +319,7 @@ const AddNewAccount = () => {
                             </div>
                           </Col>
                           {/* Birth_Date  == Done */}
-                          <Col lg={2}>
+                          {/* <Col lg={2}>
                             <div className="mb-3">
                               <Form.Label htmlFor="dateOfBirth">
                                 Date of Birth
@@ -331,8 +336,8 @@ const AddNewAccount = () => {
                               />
 
                             </div>
-                          </Col>
-                          <Col lg={3}>
+                          </Col> */}
+                          <Col lg={2}>
                             <div className="mb-3">
                               <label
                                 htmlFor="gender"
@@ -356,25 +361,7 @@ const AddNewAccount = () => {
                     
                             </div>
                           </Col>
-
-                        </Row>
-                        <Row>
-                        <Col lg={3}>
-                            <div className="mb-3">
-                              <Form.Label htmlFor="positionTitle">
-                                Position Title
-                              </Form.Label>
-                              <Form.Control
-                                type="text"
-                                id="positionTitle"
-                                placeholder="Enter position Title"
-                                value={formData.positionTitle}
-                                onChange={onChange}
-
-                              />
-                            </div>
-                          </Col>
-                          <Col lg={3}>
+                          <Col lg={2}>
                             <div className="mb-3">
                               <Form.Label>
                                 Nationality
@@ -436,6 +423,30 @@ const AddNewAccount = () => {
                               </Dropdown>
                             </div>
                           </Col>
+                          <Col lg={2}>
+                            <div className="mb-3">
+                              <Form.Label htmlFor="civilStatus">
+                                Civil Status
+                              </Form.Label>
+                              <select
+                                className="form-select text-muted"
+                                name="ccivilStatus"
+                                id="civilStatus"
+                              // required
+                              onChange={selectChangeStatus}
+                              >
+                                <option value="">Status</option>
+                                <option value="Married">Married</option>
+                                <option value="Single">Single</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Widowed">Widowed</option>
+                              </select>
+                            </div>
+                          </Col>
+                        </Row>
+                        <Row>
+                       
+                        
                           {/* Original_Nationality  == Not Yet */}
                           {/* <Col lg={3}>
                             <div className="mb-3">
@@ -499,26 +510,7 @@ const AddNewAccount = () => {
                               </Dropdown>
                             </div>
                           </Col> */}
-                          <Col lg={3}>
-                            <div className="mb-3">
-                              <Form.Label htmlFor="civilStatus">
-                                Civil Status
-                              </Form.Label>
-                              <select
-                                className="form-select text-muted"
-                                name="ccivilStatus"
-                                id="civilStatus"
-                              // required
-                              onChange={selectChangeStatus}
-                              >
-                                <option value="">Status</option>
-                                <option value="Married">Married</option>
-                                <option value="Single">Single</option>
-                                <option value="Divorced">Divorced</option>
-                                <option value="Widowed">Widowed</option>
-                              </select>
-                            </div>
-                          </Col>
+                         
                           <Row>
 
                             <Col lg={3}>
@@ -536,7 +528,7 @@ const AddNewAccount = () => {
                               </div>
 
                             </Col>
-                            <Col lg={3}>
+                            {/* <Col lg={3}>
                               <div className="mb-3">
                                 <Form.Label htmlFor="supplierName-field">
                                   Emergency Phone Number
@@ -549,7 +541,7 @@ const AddNewAccount = () => {
                                 />
                               </div>
 
-                            </Col>
+                            </Col> */}
                             <Col lg={4}>
                               <div className="mb-3">
                                 <Form.Label htmlFor="email">
@@ -564,13 +556,10 @@ const AddNewAccount = () => {
                                 />
                               </div>
                             </Col>
-                            <Row>
-
-
-                              <Col lg={3}>
+                            <Col lg={3}>
                                 <div className="mb-3">
                                   <Form.Label htmlFor="address">
-                                    House Number and Street
+                                    Address
                                   </Form.Label>
                                   <Form.Control
                                     type="text"
@@ -581,7 +570,11 @@ const AddNewAccount = () => {
                                   />
                                 </div>
                               </Col>
-                              <Col lg={3}>
+                            <Row>
+
+
+                            
+                              {/* <Col lg={3}>
                                 <div className="mb-3">
                                   <Form.Label htmlFor="supplierName-field">
                                     Locality
@@ -593,8 +586,8 @@ const AddNewAccount = () => {
                                   // required
                                   />
                                 </div>
-                              </Col>
-                              <Col lg={3}>
+                              </Col> */}
+                              {/* <Col lg={3}>
                                 <div className="mb-3">
                                   <Form.Label htmlFor="supplierName-field">
                                     Post Code
@@ -606,7 +599,7 @@ const AddNewAccount = () => {
                                   // required
                                   />
                                 </div>
-                              </Col>
+                              </Col> */}
                             </Row>
                           </Row>
 
@@ -632,6 +625,21 @@ const AddNewAccount = () => {
                           </Card.Header>
                           <Card.Body>
                             <Row>
+                            <Col lg={3}>
+                            <div className="mb-3">
+                              <Form.Label htmlFor="positionTitle">
+                                Position Title
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                id="positionTitle"
+                                placeholder="Enter position Title"
+                                value={formData.positionTitle}
+                                onChange={onChange}
+
+                              />
+                            </div>
+                          </Col>
                               <Col lg={3}>
                                 <div className="mb-3">
                                   <label
@@ -704,7 +712,7 @@ const AddNewAccount = () => {
                           </Card.Header>
                           <Card.Body>
                             <Row>
-                              <Col lg={3}>
+                              {/* <Col lg={3}>
                                 <div className="mb-3">
                                   <label
                                     htmlFor="station"
@@ -725,7 +733,7 @@ const AddNewAccount = () => {
                                     <option value="Station 4">Station 4</option>
                                   </select>
                                 </div>
-                              </Col>
+                              </Col> */}
                               <Col lg={2}>
                                 <div className="mb-3">
                                   <label

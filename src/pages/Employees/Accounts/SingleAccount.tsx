@@ -13,6 +13,7 @@ const SingleProfile = () => {
 
     document.title = "Profile | Bouden Coach Travel";
     const singleAccount = useLocation()
+    console.log(singleAccount)
    
 
     return (

@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export interface GroupInterface {
     _id?:string,
     groupName: string,
+    note:string,
     startPoint: string,
     dateStart: string,
     timeStart: string,
@@ -10,13 +11,19 @@ export interface GroupInterface {
     dateEnd: string,
     timeEnd: string,
     status: string,
-    id_company: String,
+    id_company: string,
+    employees: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+      photos:string
+  }[];
 }
 
 export const groupSlice = createApi({
   reducerPath: "Group",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8800/groupEmployee/",
+    baseUrl: "https://bouden.uk.oxa.cloud/groupEmployee/",
   }),
   tagTypes: ["Group"],
   endpoints(builder) {

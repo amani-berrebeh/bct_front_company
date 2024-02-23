@@ -14,9 +14,9 @@ import ImageHoverZoom from '../imageHover/Hover';
 
 const Profile = (props: any) => {
     const {
-        firstName, lastName, address, dropdown_time, mobile, group, station, photos, trip_ref, email, pickup_time, legalcard, positionTitle
+        firstName, lastName, address, dropdown_time, mobile, groupId, station, photos, trip_ref, email, pickup_time, legalcard, positionTitle
     } = props
-    console.log(props);
+    // console.log(group);
     //modal viewer
 
     const [modal_AddShippingModals, setmodal_AddShippingModals] =
@@ -76,7 +76,7 @@ const Profile = (props: any) => {
 
                             <Row className="mt-3 g-4">
                                 <Col lg={8}>
-                                    <div className="table-responsive">
+                                    <div className="table-responsive g-4">
                                         <Table className=" mb-0">
                                             <tbody>
                                                 <tr>
@@ -101,7 +101,7 @@ const Profile = (props: any) => {
                                                         Group:
                                                     </td>
                                                     <td className="fw-medium">
-                                                        {group}
+                                                        {groupId.groupName}
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -285,7 +285,7 @@ const Profile = (props: any) => {
             {/* </Row> */}
             <Modal className="fade zoomIn" size="lg" show={modal_AddShippingModals} onHide={() => { tog_AddShippingModals(); }} centered>
                         <Modal.Header className="px-4 pt-4" closeButton>
-                            <h5 className="modal-title fs-18" id="exampleModalLabel">Create New Group</h5>
+                            <h5 className="modal-title fs-18" id="exampleModalLabel">Legal Card</h5>
                         </Modal.Header>
                         <Modal.Body className="p-4">
                             <div id="alert-error-msg" className="d-none alert alert-danger py-2"></div>

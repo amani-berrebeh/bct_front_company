@@ -14,7 +14,7 @@ const Account = () => {
     document.title = "Account | Bouden Coach Travel";
 
     const { data = [] } = useFetchEmployeeQuery();
-    console.log(data)
+    // console.log(data)
     const [deleteEmployee] = useDeleteEmployeeMutation();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -75,22 +75,13 @@ const Account = () => {
                     </div>)
                 }
             },
-
-            // {
-            //     Header: "Address",
-            //     accessor: "address",
-            //     disableFilters: true,
-            //     filterable: true,
-            // },
-            {
-                Header: "Station",
-                accessor: "station",
-                disableFilters: true,
-                filterable: true,
-            },
             {
                 Header: "Group",
-                accessor: "group",
+                accessor: (employees: Employee) => {
+                    return (
+                        <div className="flex-grow-1 ms-2 user_name">{employees.groupId?.groupName!} </div>
+                    )
+                },
                 disableFilters: true,
                 filterable: true,
             },
@@ -100,12 +91,37 @@ const Account = () => {
                 disableFilters: true,
                 filterable: true,
             },
-            // {
-            //     Header: "Birth Date",
-            //     accessor: "dateOfBirth",
-            //     disableFilters: true,
-            //     filterable: true,
-            // },
+            {
+                Header: "Status",
+                disableFilters: true,
+                filterable: true,
+                accessor: (cellProps: Employee) => {
+                    switch (cellProps.status) {
+                        case "Active":
+                            return (<span className="badge bg-success-subtle text-success"> {cellProps.status}</span>)
+                        case "Inactive":
+                            return (<span className="badge bg-danger-subtle text-danger"> {cellProps.status}</span>)
+
+
+                    }
+                },
+            },
+
+            
+            {
+                Header: "Station",
+                accessor: "station",
+                disableFilters: true,
+                filterable: true,
+            },
+           
+          
+            {
+                Header: "Address",
+                accessor: "address",
+                disableFilters: true,
+                filterable: true,
+            },
 
 
             {

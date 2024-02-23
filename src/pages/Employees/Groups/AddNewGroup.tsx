@@ -6,6 +6,8 @@ import Flatpickr from "react-flatpickr";
 import Dropzone from "react-dropzone";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { useAddGroupMutation } from "features/groups/groupsSlice";
+
 
 const AddNewGroup = () => {
   document.title = "create Group | Bouden Coach Travel";
