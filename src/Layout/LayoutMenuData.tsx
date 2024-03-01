@@ -134,10 +134,10 @@ const Navdata = () => {
             stateVariables: isTripsSchedules,
             subItems: [
                 // { id: "level1.3", label: "Trip & management", link: "/#",icon: "bi bi-calendar-week", parentId: "Programming" },
-                { id: "level1.4", label: "Scheduling", link: "/extra-trips", icon: "bi bi-calendar3", parentId: "Programming" },
+                // { id: "level1.4", label: "Scheduling", link: "/extra-trips", icon: "bi bi-calendar3", parentId: "Programming" },
                 { id: "level1.5", label: "Offers", link: "/offers", icon: "bi bi-megaphone", parentId: "Programming" },
                 { id: "level1.6", label: "Stations", link: "/programming/station", icon: "bi bi-sign-stop", parentId: "Programming" },
-                { id: "level1.7", label: "Trip Model", link: "/extra-trips", icon: "bi bi-truck-front", parentId: "Programming" },
+                // { id: "level1.7", label: "Trip Model", link: "/extra-trips", icon: "bi bi-truck-front", parentId: "Programming" },
                 { id: "Contracts",label: "Contracts",icon: "bi bi-pencil-square",link: "/contracts"},
                 { id: "level1.8", label: "Program", link: "/program", icon: "bi bi-truck-front", parentId: "Programming" },
                 { id: "level1.9", label: "ListofPrograms", link: "/list-of-program", icon: "mdi mdi-bus-stop-uncovered", parentId: "Programming" },

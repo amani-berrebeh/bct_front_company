@@ -16,10 +16,7 @@ export interface Employee {
     dateOfBirth: string,
     legalcard: string,
     username: string,
-    groupId: {
-      _id: string;
-      groupName: string;
-  },
+    groupId?:string,
     login: string,
     password:string,
     legalcardExtension: string,
@@ -34,7 +31,7 @@ export interface Employee {
 export const employeeSlice = createApi({
   reducerPath: "Employee",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bouden.uk.oxa.cloud/employees/",
+    baseUrl: "http://localhost:8800/employees/",
   }),
   tagTypes: ["Employee"],
   endpoints(builder) {

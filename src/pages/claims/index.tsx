@@ -15,6 +15,7 @@ import Flatpickr from "react-flatpickr";
 import TableContainer from "Common/TableContainer";
 import { shipments } from "Common/data";
 import Swal from "sweetalert2";
+import { useFetchComplainQuery, useUpdateComplainMutation } from "features/complains/complainSlice";
 
 const paragraphStyles = {
   WebkitLineClamp: 2,
@@ -24,6 +25,15 @@ const paragraphStyles = {
 };
 const Claims = () => {
   document.title = "Claims | Bouden Coach Travel";
+
+
+  const {data = [] }= useFetchComplainQuery()
+  console.log(data)
+const [sendResponse]= useUpdateComplainMutation()
+
+const [formData, setFormData] = useState({
+  _id: "",
+  firstName: "",})
 
   const swalWithBootstrapButtons = Swal.mixin({
     customClass: {
@@ -101,8 +111,7 @@ const Claims = () => {
     }
   }, []);
   return (
-    // Quote ID Issue Title Travel Date Customer Name Customer Email Customer Phone Driver Status Loss Date
-    //
+    
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
@@ -145,7 +154,7 @@ const Claims = () => {
                     >
                       <Button variant="light" className="add-btn text-dark ms-auto">
                         <i className="ph ph-export me-1 align-middle"></i>{" "}
-                        Export
+                        Write a Complain
                       </Button>
                     </div>
                   </Col>
@@ -155,423 +164,97 @@ const Claims = () => {
           </Row>
           <Row>
             <div className="col-12">
-              <Row>
+              <Row>{data.map((complaint)=>(
                 <Col xxl={4}>
-                  <Card>
-                    <Card.Header>
-                      <Link
-                        to="#"
-                        className="link-danger fw-medium float-end"
-                        onClick={deleteClaim}
-                      >
-                        Archive
-                      </Link>
-                      <h5 className="card-title mb-0">
-                        Ifor Jones
-                        <span className="badge bg-success align-middle fs-10">
-                          Answered
-                        </span>
-                      </h5>
-                      <h6 className="text-muted mt-1">
-                        ifor.jones@pioneergroup.org.uk
-                      </h6>
-                      <h6 className="text-muted mt-1">0741309670</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p
-                        className="card-text d-flex"
-                        style={isOpen ? undefined : paragraphStyles}
-                        ref={ref}
-                      >
-                        <div className="table-responsive">
-                          <Table className="table-borderless table-sm mb-0">
-                            <tbody>
-                              <tr>
-                                <td className="fw-bold">Quote</td>
-                                <td className="fw-medium">20013</td>
-                              </tr>
-                              <tr>
-                                <td className="fw-bold">Title</td>
-                                <td className="fw-medium">
-                                  coach didnt turn up
-                                </td>
-                              </tr>
-                              <tr className="fw-bold">
-                                <td>Travel Date:</td>
-                                <td className="fw-medium">31 Mar 2017 10:30</td>
-                              </tr>
-                             
-                            </tbody>
-                          </Table>
-                        </div>
-                      </p>
-                      <div className="text-end">
-                        {showReadMoreButton && (
-                          <Link
-                            to="#"
-                            className="link-dark fw-medium"
-                            onClick={() => setIsOpen(!isOpen)}
-                          >
-                            {isOpen ? (
-                              <i className="ri-arrow-up-s-line align-middle"></i>
-                            ) : (
-                              <i className="ri-arrow-down-s-line align-middle"></i>
-                            )}
-                          </Link>
-                        )}
-                      </div>
-                    </Card.Body>
-                    <Card.Footer className="p-0">
-                      <p className="d-flex justify-content-end">19 Jun 2017</p>
-                    </Card.Footer>
-                  </Card>
-                </Col>
-                <Col xxl={4}>
-                  <Card>
-                    <Card.Header>
-                      <Link
-                        to="#"
-                        className="link-danger fw-medium float-end"
-                        onClick={deleteClaim}
-                      >
-                        Archive
-                      </Link>
-                      <h5 className="card-title mb-0">
-                        Pam Badham
-                        <span className="badge bg-success align-middle fs-10">
-                          Answered
-                        </span>
-                      </h5>
-                      <h6 className="text-muted mt-1">
-                        p.badham@tyler-parkes.co.uk
-                      </h6>
-                      <h6 className="text-muted mt-1">01217445511</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p
-                        className="card-text d-flex"
-                        style={isOpen ? undefined : paragraphStyles}
-                        ref={ref}
-                      >
-                        <div className="table-responsive">
-                          <Table className="table-borderless table-sm mb-0">
-                            <tbody>
-                              <tr>
-                                <td className="fw-bold">Quote</td>
-                                <td className="fw-medium">21719</td>
-                              </tr>
-                              <tr>
-                                <td className="fw-bold">Title</td>
-                                <td className="fw-medium">
-                                  Driver was late due to traffic
-                                </td>
-                              </tr>
-                              <tr className="fw-bold">
-                                <td>Travel Date:</td>
-                                <td className="fw-medium">17 May 2017 12:30</td>
-                              </tr>
+                  
+                     <Card key={complaint._id}>
+                     <Card.Header>
+                      {
+            complaint.status && complaint.status=== "pending"?
+            <Link
+            to="#"
+            className="link-info fw-medium float-end"
+            onClick={answerClaims}
+          >
+            Answer
+          </Link>:  <Link
+                         to="#"
+                         className="link-danger fw-medium float-end"
+                         onClick={deleteClaim}
+                       >
+                         Archive
+                       </Link>
+                      }
+                      
+                       <h5 className="card-title mb-0">
+                       {complaint?.id_employee?.firstName!} {complaint?.id_employee?.lastName!}
+                         <span className="badge bg-success align-middle fs-10">
+                           {complaint.status}
+                         </span>
+                       </h5>
+                       <h6 className="text-muted mt-1">
+                         {complaint?.id_employee?.email!}
+                       </h6>
+                       <h6 className="text-muted mt-1">0741309670</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p
+                         className="card-text d-flex"
+                         style={isOpen ? undefined : paragraphStyles}
+                         ref={ref}
+                       >
+                         <div className="table-responsive">
+                           <Table className="table-borderless table-sm mb-0">
+                             <tbody>
+                               <tr>
+                                 <td className="fw-bold">Quote</td>
+                                 <td className="fw-medium">20013</td>
+                               </tr>
+                               <tr>
+                                 <td className="fw-bold">Title</td>
+                                 <td className="fw-medium">
+                                  {complaint.subject}
+                                 </td>
+                               </tr>
+                               <tr className="fw-bold">
+                                 <td> Date:</td>
+                                 <td className="fw-medium">{complaint.complainDate}</td>
+                               </tr>
                               
-                            </tbody>
-                          </Table>
-                        </div>
-                      </p>
-                      <div className="text-end">
-                        {showReadMoreButton && (
-                          <Link
-                            to="#"
-                            className="link-dark fw-medium"
-                            onClick={() => setIsOpen(!isOpen)}
-                          >
-                            {isOpen ? (
-                              <i className="ri-arrow-up-s-line align-middle"></i>
-                            ) : (
-                              <i className="ri-arrow-down-s-line align-middle"></i>
-                            )}
-                          </Link>
-                        )}
-                      </div>
-                    </Card.Body>
-                    <Card.Footer className="p-0">
-                      <p className="d-flex justify-content-end">17 May 2017</p>
-                    </Card.Footer>
-                  </Card>
+                             </tbody>
+                           </Table>
+                         </div>
+                       </p>
+                       <div className="text-end">
+                         {showReadMoreButton && (
+                           <Link
+                             to="#"
+                             className="link-dark fw-medium"
+                             onClick={() => setIsOpen(!isOpen)}
+                           >
+                             {isOpen ? (
+                               <i className="ri-arrow-up-s-line align-middle"></i>
+                             ) : (
+                               <i className="ri-arrow-down-s-line align-middle"></i>
+                             )}
+                           </Link>
+                         )}
+                       </div>
+                     </Card.Body>
+                     <Card.Footer className="p-0">
+                       <p className="d-flex justify-content-end">{complaint.createdAt}</p>
+                     </Card.Footer>
+                   </Card>
+
+                 
                 </Col>
-                <Col xxl={4}>
-                  <Card>
-                    <Card.Header>
-                      <Link
-                        to="#"
-                        className="link-danger fw-medium float-end"
-                        onClick={deleteClaim}
-                      >
-                        Archive
-                      </Link>
-                      <h5 className="card-title mb-0">
-                        Shanice Edwards
-                        <span className="badge bg-success align-middle fs-10">
-                          Answered
-                        </span>
-                      </h5>
-                      <h6 className="text-muted mt-1">shan.bb@hotmail.co.uk</h6>
-                      <h6 className="text-muted mt-1">07535805677</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p
-                        className="card-text d-flex"
-                        style={isOpen ? undefined : paragraphStyles}
-                        ref={ref}
-                      >
-                        <div className="table-responsive">
-                          <Table className="table-borderless table-sm mb-0">
-                            <tbody>
-                              <tr>
-                                <td className="fw-bold">Quote</td>
-                                <td className="fw-medium">22739</td>
-                              </tr>
-                              <tr>
-                                <td className="fw-bold">Title</td>
-                                <td className="fw-medium">
-                                  Vehicle drove to the wrong place.
-                                </td>
-                              </tr>
-                              <tr className="fw-bold">
-                                <td>Travel Date:</td>
-                                <td className="fw-medium">30 May 2017 08:30</td>
-                              </tr>
-                            </tbody>
-                          </Table>
-                        </div>
-                      </p>
-                      <div className="text-end">
-                        {showReadMoreButton && (
-                          <Link
-                            to="#"
-                            className="link-dark fw-medium"
-                            onClick={() => setIsOpen(!isOpen)}
-                          >
-                            {isOpen ? (
-                              <i className="ri-arrow-up-s-line align-middle"></i>
-                            ) : (
-                              <i className="ri-arrow-down-s-line align-middle"></i>
-                            )}
-                          </Link>
-                        )}
-                      </div>
-                    </Card.Body>
-                    <Card.Footer className="p-0">
-                      <p className="d-flex justify-content-end">30 May 2017</p>
-                    </Card.Footer>
-                  </Card>
-                </Col>
+               ))}
+                 
               </Row>
             </div>
           </Row>
 
-          <Row>
-            <Col xxl={4}>
-              <Card>
-                <Card.Header>
-                  <Link
-                    to="#"
-                    className="link-secondary fw-medium float-end"
-                    onClick={() => answerClaims()}
-                  >
-                    Answer
-                  </Link>
-                  <h5 className="card-title mb-0">
-                    Zach Mclean
-                    <span className="badge bg-warning align-middle fs-10">
-                      Pending
-                    </span>
-                  </h5>
-                  <h6 className="text-muted mt-1">lcfcmclean@aol.co.uk</h6>
-                  <h6 className="text-muted mt-1">07973931555</h6>
-                </Card.Header>
-                <Card.Body>
-                  <p
-                    className="card-text d-flex"
-                    style={isOpen ? undefined : paragraphStyles}
-                    ref={ref}
-                  >
-                    <div className="table-responsive">
-                      <Table className="table-borderless table-sm mb-0">
-                        <tbody>
-                          <tr>
-                            <td className="fw-bold">Quote</td>
-                            <td className="fw-medium">22829</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-bold">Title</td>
-                            <td className="fw-medium">
-                              payment was made to late.
-                            </td>
-                          </tr>
-                          <tr className="fw-bold">
-                            <td>Travel Date:</td>
-                            <td className="fw-medium">9 Jun 2017 04:00</td>
-                          </tr>
-                         
-                        </tbody>
-                      </Table>
-                    </div>
-                  </p>
-                  <div className="text-end">
-                    {showReadMoreButton && (
-                      <Link
-                        to="#"
-                        className="link-dark fw-medium"
-                        onClick={() => setIsOpen(!isOpen)}
-                      >
-                        {isOpen ? (
-                          <i className="ri-arrow-up-s-line align-middle"></i>
-                        ) : (
-                          <i className="ri-arrow-down-s-line align-middle"></i>
-                        )}
-                      </Link>
-                    )}
-                  </div>
-                </Card.Body>
-                <Card.Footer className="p-0">
-                  <p className="d-flex justify-content-end">14 Jun 2017</p>
-                </Card.Footer>
-              </Card>
-            </Col>
-            <Col xxl={4}>
-              <Card>
-                <Card.Header>
-                  <Link
-                    to="#"
-                    className="link-secondary fw-medium float-end"
-                    onClick={() => answerClaims()}
-                  >
-                    Answer
-                  </Link>
-                  <h5 className="card-title mb-0">
-                    Kieron
-                    <span className="badge bg-warning align-middle fs-10">
-                      Pending
-                    </span>
-                  </h5>
-                  <h6 className="text-muted mt-1">kieron@lighthouse12.com</h6>
-                  <h6 className="text-muted mt-1">07713069556</h6>
-                </Card.Header>
-                <Card.Body>
-                  <p
-                    className="card-text d-flex"
-                    style={isOpen ? undefined : paragraphStyles}
-                    ref={ref}
-                  >
-                    <div className="table-responsive">
-                      <Table className="table-borderless table-sm mb-0">
-                        <tbody>
-                          <tr>
-                            <td className="fw-bold">Quote</td>
-                            <td className="fw-medium">25500</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-bold">Title</td>
-                            <td className="fw-medium">
-                              Arrival an hour later than scheduled
-                            </td>
-                          </tr>
-                          <tr className="fw-bold">
-                            <td>Travel Date:</td>
-                            <td className="fw-medium">12 Aug 2017 09:00</td>
-                          </tr>
-                        
-                        </tbody>
-                      </Table>
-                    </div>
-                  </p>
-                  <div className="text-end">
-                    {showReadMoreButton && (
-                      <Link
-                        to="#"
-                        className="link-dark fw-medium"
-                        onClick={() => setIsOpen(!isOpen)}
-                      >
-                        {isOpen ? (
-                          <i className="ri-arrow-up-s-line align-middle"></i>
-                        ) : (
-                          <i className="ri-arrow-down-s-line align-middle"></i>
-                        )}
-                      </Link>
-                    )}
-                  </div>
-                </Card.Body>
-                <Card.Footer className="p-0">
-                  <p className="d-flex justify-content-end">12 Aug 2017</p>
-                </Card.Footer>
-              </Card>
-            </Col>
-            <Col xxl={4}>
-              <Card>
-                <Card.Header>
-                  <Link
-                    to="#"
-                    className="link-danger fw-medium float-end"
-                    onClick={deleteClaim}
-                  >
-                    Archive
-                  </Link>
-                  <h5 className="card-title mb-0">
-                    Lesley Harding
-                    <span className="badge bg-success align-middle fs-10">
-                      Answered
-                    </span>
-                  </h5>
-                  <h6 className="text-muted mt-1">harding63@hotmail.com</h6>
-                  <h6 className="text-muted mt-1">07491880111</h6>
-                </Card.Header>
-                <Card.Body>
-                  <p
-                    className="card-text d-flex"
-                    style={isOpen ? undefined : paragraphStyles}
-                    ref={ref}
-                  >
-                    <div className="table-responsive">
-                      <Table className="table-borderless table-sm mb-0">
-                        <tbody>
-                          <tr>
-                            <td className="fw-bold">Quote</td>
-                            <td className="fw-medium">72236</td>
-                          </tr>
-                          <tr>
-                            <td className="fw-bold">Title</td>
-                            <td className="fw-medium">
-                              Driver rude and falling asleep at wheel
-                            </td>
-                          </tr>
-                          <tr className="fw-bold">
-                            <td>Travel Date:</td>
-                            <td className="fw-medium">24 Sep 2022 12:00</td>
-                          </tr>
-                        </tbody>
-                      </Table>
-                    </div>
-                  </p>
-                  <div className="text-end">
-                    {showReadMoreButton && (
-                      <Link
-                        to="#"
-                        className="link-dark fw-medium"
-                        onClick={() => setIsOpen(!isOpen)}
-                      >
-                        {isOpen ? (
-                          <i className="ri-arrow-up-s-line align-middle"></i>
-                        ) : (
-                          <i className="ri-arrow-down-s-line align-middle"></i>
-                        )}
-                      </Link>
-                    )}
-                  </div>
-                </Card.Body>
-                <Card.Footer className="p-0">
-                  <p className="d-flex justify-content-end">26 Sep 2022</p>
-                </Card.Footer>
-              </Card>
-            </Col>
-          </Row>
+          
         </Container>
       </div>
     </React.Fragment>

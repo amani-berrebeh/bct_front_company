@@ -431,7 +431,7 @@ const VerticalLayout = (props: any) => {
         className="bi bi-chat-left-quote"
         style={{ fontSize: "24px" }}
       ></i>
-      <span className="text-danger mt-1 fs-12">Claim</span>
+      <span className="text-danger mt-1 fs-12">Complains</span>
     </button>
   </div>
 </Col>

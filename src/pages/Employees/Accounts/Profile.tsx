@@ -100,9 +100,9 @@ const Profile = (props: any) => {
                                                     <td className="fw-bold">
                                                         Group:
                                                     </td>
-                                                    <td className="fw-medium">
+                                                    {/* <td className="fw-medium">
                                                         {groupId.groupName}
-                                                    </td>
+                                                    </td> */}
                                                 </tr>
                                             </tbody>
                                         </Table>

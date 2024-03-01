@@ -14,7 +14,7 @@ const Account = () => {
     document.title = "Account | Bouden Coach Travel";
 
     const { data = [] } = useFetchEmployeeQuery();
-    // console.log(data)
+    console.log(data)
     const [deleteEmployee] = useDeleteEmployeeMutation();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -77,7 +77,7 @@ const Account = () => {
             },
             {
                 Header: "Group",
-                accessor: (employees: Employee) => {
+                accessor: (employees: any) => {
                     return (
                         <div className="flex-grow-1 ms-2 user_name">{employees.groupId?.groupName!} </div>
                     )

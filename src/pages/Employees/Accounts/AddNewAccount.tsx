@@ -1,5 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Button, Card, Col, Container, Dropdown, Form, Image, Row } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  Col,
+  Container,
+  Dropdown,
+  Form,
+  Image,
+  Row,
+} from "react-bootstrap";
 import Breadcrumb from "Common/BreadCrumb";
 import { Link, useNavigate } from "react-router-dom";
 import Flatpickr from "react-flatpickr";
@@ -10,10 +19,9 @@ import SimpleBar from "simplebar-react";
 import country from "Common/country";
 import Swal from "sweetalert2";
 import { useAddEmployeeMutation } from "features/employees/employeesSlice";
-import flatpickr from 'flatpickr';
-import 'flatpickr/dist/flatpickr.min.css';
-
-
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
+import { useFetchGroupQuery } from "features/groups/groupsSlice";
 
 const AddNewAccount = () => {
   document.title = "create Account | Bouden Coach Travel";
@@ -21,14 +29,15 @@ const AddNewAccount = () => {
   const [selectedFiles, setselectedFiles] = useState([]);
   // Mutation to create account
   const [createAccount] = useAddEmployeeMutation();
+  const { data: AllGroups = [] } = useFetchGroupQuery();
   // Account's Values and Functions
   const [formData, setFormData] = useState({
     _id: "",
-    firstName:"",
+    firstName: "",
     lastName: "",
     idCompany: "",
     gender: "",
-    civilStatus:"",
+    civilStatus: "",
     address: "",
     station: "",
     mobile: "",
@@ -37,19 +46,16 @@ const AddNewAccount = () => {
     dateOfBirth: "",
     legalcard: "",
     username: "",
-    groupId: {
-      _id:"",
-      groupName:""
-    },
+    groupId: "65def391137b93f458f52c1f",
     login: "",
     password: "",
-    photosBase64String:"",
-    photosExtension:"",
-    legalcardBase64String:"",
-    legalcardExtension:"",
-    positionTitle:"",
-    nationality:"",
-    status:""
+    photosBase64String: "",
+    photosExtension: "",
+    legalcardBase64String: "",
+    legalcardExtension: "",
+    positionTitle: "",
+    nationality: "",
+    status: "",
   });
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({
@@ -60,7 +66,7 @@ const AddNewAccount = () => {
 
   const [seletedCountry, setseletedCountry] = useState<any>({});
   const [seletedCountry1, setseletedCountry1] = useState<any>({});
-  
+
   // change gender
   const [selectedOption, setSelectedOption] = useState<string>("");
   // This function is triggered when the select changes
@@ -71,7 +77,7 @@ const AddNewAccount = () => {
 
   //change civil status
   const [selectedStatus, setSelectedStatus] = useState<string>("");
-  
+
   const selectChangeStatus = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     setSelectedStatus(value);
@@ -79,34 +85,38 @@ const AddNewAccount = () => {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-//change station
+  //change station
   const [selectedStation, setSelectedStation] = useState<string>("");
-  
+
   const selectChangeStation = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     setSelectedStation(value);
   };
 
- //change group
- const [selectedGroup, setSelectedGroup] = useState<string>("");
-  
- const selectChangeGroup = (event: React.ChangeEvent<HTMLSelectElement>) => {
-   const value = event.target.value;
-   setSelectedGroup(value);
- };
+  //change group
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
+
+  const selectChangeGroup = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedGroup(value);
+  };
 
   const handleDateChange = (selectedDates: Date[]) => {
     // Assuming you only need the first selected date
     setSelectedDate(selectedDates[0]);
   };
 
-
   const onSubmitAccount = (e: React.FormEvent<HTMLFormElement>) => {
     formData["gender"] = selectedOption;
-    formData["civilStatus"]= selectedStatus;
-    formData["station"]= selectedStation;
-    formData["groupId"].groupName! = selectedGroup
-    formData["nationality"]= seletedCountry1.countryName;
+    formData["civilStatus"] = selectedStatus;
+    formData["station"] = selectedStation;
+    if (selectedGroup === "") {
+      formData["groupId"] = "65def391137b93f458f52c1f";
+    } else {
+      formData["groupId"] = selectedGroup;
+    }
+
+    formData["nationality"] = seletedCountry1.countryName;
     // formData["dateOfBirth"] = selectedDate!.toDateString();
     e.preventDefault();
     createAccount(formData).then(() => setFormData(formData));
@@ -143,7 +153,6 @@ const AddNewAccount = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
   }
-  
 
   function convertToBase64(
     file: File
@@ -207,7 +216,7 @@ const AddNewAccount = () => {
           <Row>
             <Col lg={12}>
               <Card>
-                <Card.Header>
+                {/* <Card.Header>
                   <div className="d-flex">
                     <div className="flex-shrink-0 me-3">
                       <div className="avatar-sm">
@@ -220,14 +229,14 @@ const AddNewAccount = () => {
                       <h5 className="card-title mb-1">Employee's Account</h5>
                     </div>
                   </div>
-                </Card.Header>
+                </Card.Header> */}
                 <Card.Body>
                   <Card.Header>
                     <div className="d-flex">
                       <div className="flex-shrink-0 me-3">
                         <div className="avatar-sm">
                           <div className="avatar-title rounded-circle bg-light text-primary fs-20">
-                            <i className="bi bi-box-seam"></i>
+                            <i className="bi bi-person-lines-fill"></i>
                           </div>
                         </div>
                       </div>
@@ -236,55 +245,51 @@ const AddNewAccount = () => {
                       </div>
                     </div>
                   </Card.Header>
-                  <Card.Body>
-
-                  </Card.Body>
+                  <Card.Body></Card.Body>
                   <div className="mb-3">
                     <Form className="tablelist-form" onSubmit={onSubmitAccount}>
                       <input type="hidden" id="id-field" />
                       <Row>
-                      <div className="text-center mb-3">
-                            <div
-                              className="position-relative d-inline-block"
-                              style={{ marginBottom: "30px" }}
-                            >
-                              <div className="position-absolute top-100 start-100 translate-middle">
-                                <label
-                                  htmlFor="photosBase64String"
-                                  className="mb-0"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-placement="right"
-                                  title="Select Employee Picture"
-                                >
-                                  <span className="avatar-xs d-inline-block">
-                                    <span className="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
-                                      <i className="ri-image-fill"></i>
-                                      
-                                    </span>
+                        <div className="text-center mb-3">
+                          <div
+                            className="position-relative d-inline-block"
+                            style={{ marginBottom: "30px" }}
+                          >
+                            <div className="position-absolute top-100 start-100 translate-middle">
+                              <label
+                                htmlFor="photosBase64String"
+                                className="mb-0"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="right"
+                                title="Select Employee Picture"
+                              >
+                                <span className="avatar-xs d-inline-block">
+                                  <span className="avatar-title bg-light border rounded-circle text-muted cursor-pointer">
+                                    <i className="ri-image-fill"></i>
                                   </span>
-                                </label>
-                                <input
-                                  className="d-none"
-                                  type="file"
-                                  name="photosBase64String"
+                                </span>
+                              </label>
+                              <input
+                                className="d-none"
+                                type="file"
+                                name="photosBase64String"
+                                id="photosBase64String"
+                                accept="image/*"
+                                onChange={(e) => handleFileUpload(e)}
+                              />
+                            </div>
+                            <div className="avatar-xl">
+                              <div className="avatar-title bg-light rounded-4">
+                                <img
+                                  src={`data:image/*;base64, ${formData.photosBase64String}`}
+                                  // alt={formData.firstName}
                                   id="photosBase64String"
-                                  accept="image/*"
-                                  onChange={(e) => handleFileUpload(e)}
+                                  className="avatar-xl h-auto rounded-4 object-fit-cover"
                                 />
-                              </div>
-                              <div className="avatar-xl">
-                                <div className="avatar-title bg-light rounded-4">
-                                  <img 
-                                    src={`data:image/*;base64, ${formData.photosBase64String}`}
-                                    // alt={formData.firstName}
-                                    id="photosBase64String"
-                                    className="avatar-xl h-auto rounded-4 object-fit-cover"
-                                  />
-                                  
-                                </div>
                               </div>
                             </div>
                           </div>
+                        </div>
                         <Row>
                           {/* First Name  == Done */}
                           <Col lg={3}>
@@ -314,7 +319,6 @@ const AddNewAccount = () => {
                                 placeholder="Enter last name"
                                 value={formData.lastName}
                                 onChange={onChange}
-
                               />
                             </div>
                           </Col>
@@ -339,10 +343,7 @@ const AddNewAccount = () => {
                           </Col> */}
                           <Col lg={2}>
                             <div className="mb-3">
-                              <label
-                                htmlFor="gender"
-                                className="form-label"
-                              >
+                              <label htmlFor="gender" className="form-label">
                                 Gender
                               </label>
                               <select
@@ -358,21 +359,19 @@ const AddNewAccount = () => {
                                 <option value="female">Female</option>
                                 <option value="other">Other</option>
                               </select>
-                    
                             </div>
                           </Col>
                           <Col lg={2}>
                             <div className="mb-3">
-                              <Form.Label>
-                                Nationality
-                              </Form.Label>
+                              <Form.Label>Nationality</Form.Label>
                               <Dropdown>
                                 <Dropdown.Toggle
                                   as="input"
                                   style={{
-                                    backgroundImage: `url(${seletedCountry1.flagImg &&
+                                    backgroundImage: `url(${
+                                      seletedCountry1.flagImg &&
                                       seletedCountry1.flagImg
-                                      })`,
+                                    })`,
                                   }}
                                   className="form-control rounded-end flag-input form-select"
                                   placeholder="Select country"
@@ -432,8 +431,8 @@ const AddNewAccount = () => {
                                 className="form-select text-muted"
                                 name="ccivilStatus"
                                 id="civilStatus"
-                              // required
-                              onChange={selectChangeStatus}
+                                // required
+                                onChange={selectChangeStatus}
                               >
                                 <option value="">Status</option>
                                 <option value="Married">Married</option>
@@ -445,8 +444,6 @@ const AddNewAccount = () => {
                           </Col>
                         </Row>
                         <Row>
-                       
-                        
                           {/* Original_Nationality  == Not Yet */}
                           {/* <Col lg={3}>
                             <div className="mb-3">
@@ -510,9 +507,8 @@ const AddNewAccount = () => {
                               </Dropdown>
                             </div>
                           </Col> */}
-                         
-                          <Row>
 
+                          <Row>
                             <Col lg={3}>
                               <div className="mb-3">
                                 <Form.Label htmlFor="mobile">
@@ -523,10 +519,9 @@ const AddNewAccount = () => {
                                   id="mobile"
                                   onChange={onChange}
                                   placeholder="Enter phone"
-                                // required
+                                  // required
                                 />
                               </div>
-
                             </Col>
                             {/* <Col lg={3}>
                               <div className="mb-3">
@@ -544,36 +539,31 @@ const AddNewAccount = () => {
                             </Col> */}
                             <Col lg={4}>
                               <div className="mb-3">
-                                <Form.Label htmlFor="email">
-                                  Email
-                                </Form.Label>
+                                <Form.Label htmlFor="email">Email</Form.Label>
                                 <Form.Control
                                   type="email"
                                   id="email"
                                   onChange={onChange}
                                   placeholder="Enter email"
-                                // required
+                                  // required
                                 />
                               </div>
                             </Col>
                             <Col lg={3}>
-                                <div className="mb-3">
-                                  <Form.Label htmlFor="address">
-                                    Address
-                                  </Form.Label>
-                                  <Form.Control
-                                    type="text"
-                                    id="address"
-                                    placeholder="Enter address"
-                                    onChange={onChange}
+                              <div className="mb-3">
+                                <Form.Label htmlFor="address">
+                                  Address
+                                </Form.Label>
+                                <Form.Control
+                                  type="text"
+                                  id="address"
+                                  placeholder="Enter address"
+                                  onChange={onChange}
                                   // required
-                                  />
-                                </div>
-                              </Col>
+                                />
+                              </div>
+                            </Col>
                             <Row>
-
-
-                            
                               {/* <Col lg={3}>
                                 <div className="mb-3">
                                   <Form.Label htmlFor="supplierName-field">
@@ -602,11 +592,7 @@ const AddNewAccount = () => {
                               </Col> */}
                             </Row>
                           </Row>
-
-
-
                         </Row>
-
 
                         <Col lg={12}>
                           <Card.Header>
@@ -614,38 +600,36 @@ const AddNewAccount = () => {
                               <div className="flex-shrink-0 me-3">
                                 <div className="avatar-sm">
                                   <div className="avatar-title rounded-circle bg-light text-primary fs-20">
-                                    <i className="bi bi-box-seam"></i>
+                                    <i className="bi bi-person-fill-add"></i>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex-grow-1">
-                                <h5 className="card-title">Identification and Authentication</h5>
+                                <h5 className="card-title">
+                                  Identification and Authentication
+                                </h5>
                               </div>
                             </div>
                           </Card.Header>
                           <Card.Body>
                             <Row>
-                            <Col lg={3}>
-                            <div className="mb-3">
-                              <Form.Label htmlFor="positionTitle">
-                                Position Title
-                              </Form.Label>
-                              <Form.Control
-                                type="text"
-                                id="positionTitle"
-                                placeholder="Enter position Title"
-                                value={formData.positionTitle}
-                                onChange={onChange}
-
-                              />
-                            </div>
-                          </Col>
                               <Col lg={3}>
                                 <div className="mb-3">
-                                  <label
-                                    htmlFor="login"
-                                    className="form-label"
-                                  >
+                                  <Form.Label htmlFor="positionTitle">
+                                    Position Title
+                                  </Form.Label>
+                                  <Form.Control
+                                    type="text"
+                                    id="positionTitle"
+                                    placeholder="Enter position Title"
+                                    value={formData.positionTitle}
+                                    onChange={onChange}
+                                  />
+                                </div>
+                              </Col>
+                              <Col lg={3}>
+                                <div className="mb-3">
+                                  <label htmlFor="login" className="form-label">
                                     Employee ID
                                   </label>
                                   <Form.Control
@@ -653,7 +637,7 @@ const AddNewAccount = () => {
                                     id="login"
                                     placeholder="login"
                                     onChange={onChange}
-                                  // required
+                                    // required
                                   />
                                 </div>
                               </Col>
@@ -678,16 +662,15 @@ const AddNewAccount = () => {
                                     Legal Card
                                   </label>
                                   <Form.Control
-                                  
-                                   name="legalcardBase64String"
-                                   onChange={handlePDFUpload}
+                                    name="legalcardBase64String"
+                                    onChange={handlePDFUpload}
                                     type="file"
                                     id="legalcardBase64String"
                                     accept=".pdf"
                                     placeholder="Choose File"
                                     className="text-muted"
-                                    
-                                  // required
+
+                                    // required
                                   />
                                 </div>
                               </Col>
@@ -701,12 +684,14 @@ const AddNewAccount = () => {
                               <div className="flex-shrink-0 me-3">
                                 <div className="avatar-sm">
                                   <div className="avatar-title rounded-circle bg-light text-primary fs-20">
-                                    <i className="bi bi-box-seam"></i>
+                                    <i className="bi bi-truck-front"></i>
                                   </div>
                                 </div>
                               </div>
                               <div className="flex-grow-1">
-                                <h5 className="card-title">Transportation-Specific Information</h5>
+                                <h5 className="card-title">
+                                  Transportation-Specific Information
+                                </h5>
                               </div>
                             </div>
                           </Card.Header>
@@ -736,10 +721,7 @@ const AddNewAccount = () => {
                               </Col> */}
                               <Col lg={2}>
                                 <div className="mb-3">
-                                  <label
-                                    htmlFor="group"
-                                    className="form-label"
-                                  >
+                                  <label htmlFor="group" className="form-label">
                                     Group
                                   </label>
                                   <select
@@ -747,12 +729,16 @@ const AddNewAccount = () => {
                                     name="choices-single-default"
                                     id="group"
                                     onChange={selectChangeGroup}
-                                  // required
                                   >
                                     <option value="Group">Group</option>
-                                    <option value="Group1">Group 1</option>
-                                    <option value="Group2">Group 2</option>
-                                  
+                                    {AllGroups.map((groups) => (
+                                      <option
+                                        value={groups?._id!}
+                                        key={groups?._id!}
+                                      >
+                                        {groups?.groupName}
+                                      </option>
+                                    ))}
                                   </select>
                                 </div>
                               </Col>
@@ -802,7 +788,6 @@ const AddNewAccount = () => {
                                   </select>
                                 </div>
                               </Col> */}
-
                             </Row>
                           </Card.Body>
                         </Col>
@@ -830,7 +815,11 @@ const AddNewAccount = () => {
                           </Col> */}
                         <Col lg={12}>
                           <div className="hstack gap-2 justify-content-end">
-                            <Button variant="primary" id="add-btn" type="submit">
+                            <Button
+                              variant="primary"
+                              id="add-btn"
+                              type="submit"
+                            >
                               Add New employee's Account
                             </Button>
                           </div>
@@ -842,7 +831,6 @@ const AddNewAccount = () => {
               </Card>
             </Col>
           </Row>
-
         </Container>
       </div>
     </React.Fragment>

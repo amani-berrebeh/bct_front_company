@@ -23,7 +23,7 @@ export interface GroupInterface {
 export const groupSlice = createApi({
   reducerPath: "Group",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://bouden.uk.oxa.cloud/groupEmployee/",
+    baseUrl: "http://localhost:8800/groupEmployee/",
   }),
   tagTypes: ["Group"],
   endpoints(builder) {
