@@ -9,6 +9,9 @@ export interface Complain {
       email:string,
       firstName:string,
       lastName:string,
+      mobile:string,
+      photos:string
+
     },
     subject:string,
     description:string,
