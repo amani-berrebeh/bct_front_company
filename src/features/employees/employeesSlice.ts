@@ -2,7 +2,6 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Employee {
     _id:string,
-   
     firstName:string,
     lastName:string,
     idCompany: string,

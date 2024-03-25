@@ -86,6 +86,7 @@ import Programs from "pages/Programming/Programs";
 import ProgramList from "pages/Programming/programList";
 import ProgramClone from "pages/Programming/programList/ProgramClone";
 import ProgramDetails from "pages/Programming/programList/ProgramDetails";
+import AddProgramm from "pages/Programming/Programs";
 
 const authProtectedRoutes = [
   
@@ -107,8 +108,8 @@ const publicRoutes = [
   { path: "/Scheduling", component: <CurrencyRates /> },
 
   
-  { path: "/program", component: < Programs/> },
-  { path: "/list-of-program", component: < ProgramList/> },
+  { path: "/programming/addProgram", component: < AddProgramm/> },
+  { path: "/programming/list-of-programs", component: < ProgramList/> },
   { path: "/program/:name", component: < ProgramClone/> },
   { path: "/program-details/:name", component: < ProgramDetails/> },
 

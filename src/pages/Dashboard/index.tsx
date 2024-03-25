@@ -1,15 +1,17 @@
 import React from 'react';
 import { Col, Container, Row } from 'react-bootstrap';
 import CustomerSatisfaction from './CustomerSatisfaction';
-import NewCustomers from './NewCustomers';
+
 import ProductDelivery from './ProductDelivery';
 import StockReport from './StockReport';
 import TopCategories from './TopCategories';
-import TopProducts from './TopProducts';
+
 import TopSalesLocation from './TopSalesLocation';
 import Widgets from './Widgets';
 import RecentOrders from './RecentOrders';
 import Revenue from './Revenue';
+import TopTrips from './TopTrips';
+import NewEmployees from './NewEmployees';
 
 const Dashboard = () => {
 
@@ -25,19 +27,19 @@ const Dashboard = () => {
                                 <Widgets />
                             </Row>
                         </Col>
-                        <Revenue />
+                        {/* <Revenue />
                         <TopSalesLocation />
                     </Row>
                     <Row>
-                        <RecentOrders />
-                    </Row>
+                        <RecentOrders />*/}
+                    </Row> 
                     <Row className='widget-responsive-fullscreen'>
-                        <CustomerSatisfaction />
-                        <StockReport />
+                        {/* <CustomerSatisfaction />
+                        <StockReport /> */}
                         <ProductDelivery />
                         <TopCategories />
-                        <NewCustomers />
-                        <TopProducts />
+                        <NewEmployees />
+                        <TopTrips />
                     </Row>
                 </Container>
             </div>

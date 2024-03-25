@@ -1,0 +1,62 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export interface Note {
+    _id:string,
+    title: string,
+  message: string,
+  pdf:string,
+  pdfBase64String:string,
+  pdfExtension:string,
+  photo:string,
+  photoBase64Strings:string,
+  photoExtension:string
+}
+export const noteSlice = createApi({
+    reducerPath: "Note",
+    baseQuery: fetchBaseQuery({
+      baseUrl: "http://localhost:8800/notes/",
+    }),
+    tagTypes: ["Note"],
+    endpoints(builder) {
+      return {
+        fetchNote: builder.query<Note[], number | void>({
+          query() {
+            return `/getAllNotes`;
+          },
+          providesTags: ["Note"],
+        }),
+        addNote: builder.mutation<void, Note>({
+          query(payload) {
+            return {
+              url: "/newNote",
+              method: "POST",
+              body: payload,
+            };
+          },
+          invalidatesTags: ["Note"],
+        }),
+        updateNote: builder.mutation<void, Note>({
+          query: ({ _id, ...rest }) => ({
+            url: `/updateNote/${_id}`,
+            method: "PUT",
+            body: rest,
+          }),
+          invalidatesTags: ["Note"],
+        }),
+        deleteNote: builder.mutation<void, number>({
+          query: (_id) => ({
+            url: `deleteNote/${_id}`,
+            method: "DELETE",
+          }),
+          invalidatesTags: ["Note"],
+        }),
+      };
+    },
+  });
+  
+  export const {
+    useAddNoteMutation,
+    useFetchNoteQuery,
+    useDeleteNoteMutation,
+    useUpdateNoteMutation,
+  } = noteSlice;

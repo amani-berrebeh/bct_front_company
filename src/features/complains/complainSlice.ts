@@ -1,17 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export interface Complain {
     _id:string,
-   
     id_corporate:string,
     id_student:string,
     id_parent:string,
-    id_employee:{
-      email:string,
-      firstName:string,
-      lastName:string,
-      mobile:string,
-      photos:string
-
+    id_employee?:
+    {
+      _id?:string,
+      email?:string,
+      firstName?:string,
+      lastName?:string,
+      mobile?:string,
+      photos?:string
     },
     subject:string,
     description:string,
@@ -20,11 +20,35 @@ export interface Complain {
     responseAuthor:string,
     responseDate:string,
     status:string,
-    mediaBase64String:string,
-    mediaExtension:string,
+    pdf:string,
+    pdfBase64String:string,
+    pdfExtension:string,
     createdAt:string,
-    updatedAt:string
+    updatedAt:string,
+    photo:string,
+    photoBase64Strings:string,
+    photoExtension:string,
+    video:string,
+    videoBase64Strings:string,
+    videoExtension:string,
+    resPhoto:string,
+    resVideo:string,
+    resPhotoBase64Strings:string,
+    resVideoBase64Strings:string,
+    ResPhotoExtension:string,
+    ResVideoExtension:string
 }
+// export interface ResComplain {
+//   _id:string,
+//   responseMessage:string,
+//   resPhoto:string,
+//     resVideo:string,
+//     resPhotoBase64Strings:string,
+//     resVideoBase64Strings:string,
+//     ResPhotoExtension:string,
+//     ResVideoExtension:string
+
+// }
 
 export const complainSlice = createApi({
     reducerPath: "Complain",
@@ -51,12 +75,32 @@ export const complainSlice = createApi({
           invalidatesTags: ["Complain"],
         }),
 
+        // updateComplainResponse: builder.mutation<void, Complain>({
+        //     query:({_id, responseMessage})=> {
+        //       return {
+        //         url: "/response",
+        //         method: "POST",
+        //         body: {_id, responseMessage},
+        //       };
+        //     },
+        //     invalidatesTags: ["Complain"],
+        //   }),
         updateComplainResponse: builder.mutation<void, Complain>({
-            query:({_id, responseMessage})=> {
+          query:(payload)=> {
+            return {
+              url: "/response",
+              method: "POST",
+              body: payload,
+            };
+          },
+          invalidatesTags: ["Complain"],
+        }),
+          updateComplainToPushed: builder.mutation<void, Complain>({
+            query:({_id})=> {
               return {
-                url: "/response",
-                method: "POST",
-                body: {_id, responseMessage},
+                url: "/updateToPushed",
+                method: "PUT",
+                body: {_id},
               };
             },
             invalidatesTags: ["Complain"],
@@ -85,5 +129,6 @@ export const complainSlice = createApi({
     useFetchComplainQuery,
     useDeleteComplainMutation,
     useUpdateComplainMutation,
-    useUpdateComplainResponseMutation
+    useUpdateComplainResponseMutation,
+    useUpdateComplainToPushedMutation
   } = complainSlice;

@@ -1,34 +1,35 @@
 import React, { useState } from "react";
-import {
-  Container,
-  Row,
-  Card,
-  Col,
-  Modal
-} from "react-bootstrap";
+import { Container, Row, Card, Col, Modal, Button } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import Breadcrumb from "Common/BreadCrumb";
 import Flatpickr from "react-flatpickr";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleApiWrapper, Map, Marker } from "google-maps-react";
+import { useFetchProgramsQuery } from "features/program/programSlice";
 
 const LoadingContainer = () => <div>Loading...</div>;
 const ProgramList = (props: any) => {
-  document.title = "List of Programs | Bouden Coach Travel";
+  document.title = "List of Programs | Company";
   const [modal_Pickup, setmodal_Pickup] = useState<boolean>(false);
+  const [modal_Destination, setmodal_Destination] = useState<boolean>(false);
+  const { data = [] } = useFetchProgramsQuery();
   function tog_Pickup() {
     setmodal_Pickup(!modal_Pickup);
   }
-  const [modal_Destination, setmodal_Destination] = useState<boolean>(false);
+
+  console.log(data)
+  const navigate = useNavigate();
   function tog_Destination() {
     setmodal_Destination(!modal_Destination);
   }
+  function tog_AddShippingModals() {
+    navigate("/programming/add-program");
+  }
+
   const columns = [
     {
-      name: (
-        <span className="font-weight-bold fs-13">Name</span>
-      ),
-      selector: (row: any) => row.Name,
+      name: <span className="font-weight-bold fs-13">Name</span>,
+      selector: (row: any) => row.programName,
       sortable: true,
     },
     {
@@ -37,7 +38,9 @@ const ProgramList = (props: any) => {
         return (
           <span>
             <Link to="#">
-              <span className="text-secondary" onClick={() => tog_Pickup()}>{cell.Pickup}</span>
+              <span className="text-secondary" onClick={() => tog_Pickup()}>
+                {cell.origin_point.placeName}
+              </span>
             </Link>
           </span>
         );
@@ -45,45 +48,48 @@ const ProgramList = (props: any) => {
       sortable: true,
     },
     {
-      name: (
-        <span className="font-weight-bold fs-13">Destination</span>
-      ),
+      name: <span className="font-weight-bold fs-13">Destination</span>,
       selector: (cell: any) => {
         return (
           <span>
             <Link to="#">
-              <span className="text-secondary" onClick={() => tog_Destination()}>{cell.Destination}</span>
+              <span
+                className="text-secondary"
+                onClick={() => tog_Destination()}
+              >
+                {cell.destination_point.placeName}
+              </span>
             </Link>
           </span>
         );
       },
       sortable: true,
     },
-    {
-      name: <span className="font-weight-bold fs-13">Stops</span>,
-      selector: (row: any) => row.Stops,
-      sortable: true,
-    },
+    // {
+    //   name: <span className="font-weight-bold fs-13">Stops</span>,
+    //   selector: (row: any) => row.stops?.address!,
+    //   sortable: true,
+    // },
     {
       name: <span className="font-weight-bold fs-13">From</span>,
-      selector: (row: any) => row.From,
+      selector: (row: any) => row.pickUp_date,
       sortable: true,
     },
     {
       name: <span className="font-weight-bold fs-13">To</span>,
-      selector: (row: any) => row.Date,
+      selector: (row: any) => row.droppOff_date,
       sortable: true,
     },
-    {
-      name: <span className="font-weight-bold fs-13">At</span>,
-      selector: (row: any) => row.Time,
-      sortable: true,
-    },
-    {
-      name: <span className="font-weight-bold fs-13">Exception</span>,
-      selector: (row: any) => row.Exception,
-      sortable: true,
-    },
+    // {
+    //   name: <span className="font-weight-bold fs-13">Free Days date</span>,
+    //   selector: (row: any) => row.freeDays_date,
+    //   sortable: true,
+    // },
+    // {
+    //   name: <span className="font-weight-bold fs-13">Exception</span>,
+    //   selector: (row: any) => row.exceptDays,
+    //   sortable: true,
+   // },
     {
       name: <span className="font-weight-bold fs-13">Action</span>,
       sortable: true,
@@ -91,23 +97,88 @@ const ProgramList = (props: any) => {
         return (
           <ul className="hstack gap-2 list-unstyled mb-0">
             <li>
-              <Link to={`/program/${row.Name}`} className="badge badge-soft-dark edit-item-btn" state={row}>
-                <i className="mdi mdi-voicemail" title="Clone"></i>
+              <Link
+                to={`/program/${row.Name}`}
+                className="badge badge-soft-dark edit-item-btn"
+                state={row}
+              >
+                <i
+                  className="ph ph-copy"
+                  style={{
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                    fontSize: "1.5em",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                  title="Clone"
+                ></i>
               </Link>
             </li>
             <li>
-              <Link to={`/program-details/${row.Name}`} className="badge badge-soft-primary edit-item-btn" state={row}>
-                <i className="ri-eye-line"></i>
+              <Link
+                to={`/program-details/${row.Name}`}
+                className="badge badge-soft-primary edit-item-btn"
+                state={row}
+              >
+                <i
+                  className="ph ph-eye"
+                  style={{
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                    fontSize: "1.5em",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                ></i>
               </Link>
             </li>
             <li>
-              <Link to={`/edit-program/${row.Name}`} className="badge badge-soft-success edit-item-btn" state={row}>
-                <i className="ri-edit-2-line"></i>
+              <Link
+                to={`/edit-program/${row.Name}`}
+                className="badge badge-soft-success edit-item-btn"
+                state={row}
+              >
+                <i
+                  className="ph ph-pencil-line"
+                  style={{
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                    fontSize: "1.5em",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                ></i>
               </Link>
             </li>
             <li>
               <Link to="#" className="badge badge-soft-danger remove-item-btn">
-                <i className="ri-delete-bin-2-line"></i>
+                <i
+                  className="ph ph-trash"
+                  style={{
+                    transition: "transform 0.3s ease-in-out",
+                    cursor: "pointer",
+                    fontSize: "1.5em",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.transform = "scale(1.2)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.transform = "scale(1)")
+                  }
+                ></i>
               </Link>
             </li>
           </ul>
@@ -115,53 +186,16 @@ const ProgramList = (props: any) => {
       },
     },
   ];
-  const data = [
-    {
-      Name: "BIRMINGHAM_DWYRAN",
-      Pickup: "BIRMINGHAM NEW STREET STATION",
-      Destination: "Dwyran, Wales LL61 6AX",
-      Stops: "Deeside, Northop Hall, Saint-Asaph, Colwyn Bay",
-      From: "12 Sep 2023",
-      Date: "21 Dec 2023",
-      Time: "07:00",
-      Exception: "Sunday",
-      Extra: "Wifi",
-      PassengersNumber: "60",
-    },
-    {
-      Name: "Norwich-Airport_Galleyend-Chelmsford",
-      Pickup: "Norwich Airport",
-      Destination: "Galleyend, Chelmsford",
-      Stops: "Colchester, Ipswich, SAXONS SHOOTING CLUB",
-      From: "01 Jan 2023",
-      Date: "30 Juin 2023",
-      Time: "07:15",
-      Exception: "Saturday, Sunday",
-      Extra: "WC, AC, Wifi",
-      PassengersNumber: "45",
-    },
-    {
-      Name: "ODS-Group-Horspath_Jesmond-Dene-House",
-      Pickup: "ODS Group Horspath",
-      Destination: "Jesmond Dene House",
-      Stops: "Coventry, Derby, Sheffield, Leeds, Middlesbrough",
-      From: "01 July 2023",
-      Date: "31 Aug 2023",
-      Time: "06:15",
-      Exception: "Sunday",
-      Extra: "WC, AC, Wifi, Drop in the Middle",
-      PassengersNumber: "55",
-    },
-  ];
+
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid>
-          <Breadcrumb title="List of Programs" pageTitle="Management" />
+          <Breadcrumb title="Programming" pageTitle="" />
           <Col lg={12}>
             <Card>
               <Card.Body>
-                <Row className="g-lg-2 g-4">
+                <Row className="g-3">
                   <Col sm={9} className="col-lg-auto">
                     <select
                       className="form-select text-muted"
@@ -205,6 +239,17 @@ const ProgramList = (props: any) => {
                       <option value="Out Of Delivery">Out Of Delivery</option>
                     </select>
                   </Col>
+
+                  <Col lg={5} className="d-flex justify-content-end">
+                    <Button
+                      variant="secondary"
+                      onClick={() => tog_AddShippingModals()}
+                      className="add-btn"
+                    >
+                      <i className="bi bi-plus-circle me-1 align-middle "></i>{" "}
+                      Add Programm
+                    </Button>
+                  </Col>
                 </Row>
               </Card.Body>
             </Card>
@@ -221,7 +266,6 @@ const ProgramList = (props: any) => {
                       <i className="ri-search-line search-icon"></i>
                     </div>
                   </Col>
-
                 </Row>
               </Card.Header>
               <Card.Body>
@@ -246,9 +290,7 @@ const ProgramList = (props: any) => {
               style={{ height: "118%", width: "95%" }}
               initialCenter={{ lat: 52.477732, lng: -1.8988277 }}
             >
-              <Marker
-                position={{ lat: 52.477732, lng: -1.8988277 }}
-              />
+              <Marker position={{ lat: 52.477732, lng: -1.8988277 }} />
             </Map>
           </Modal.Body>
         </Modal>
@@ -268,9 +310,7 @@ const ProgramList = (props: any) => {
               style={{ height: "118%", width: "95%" }}
               initialCenter={{ lat: 53.1668422, lng: -4.3276843 }}
             >
-              <Marker
-                position={{ lat: 53.1660000, lng: -4.3269000 }}
-              />
+              <Marker position={{ lat: 53.166, lng: -4.3269 }} />
             </Map>
           </Modal.Body>
         </Modal>

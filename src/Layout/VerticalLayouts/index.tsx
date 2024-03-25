@@ -513,7 +513,7 @@ const VerticalLayout = (props: any) => {
       </Modal>
       <Modal
         className="fade zoomIn"
-        size="sm"
+        size="lg"
         show={modal_Note}
         onHide={() => {
           tog_ModalNotes();

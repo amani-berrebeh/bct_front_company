@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -10,14 +10,20 @@ import {
   Table,
 } from "react-bootstrap";
 import Breadcrumb from "Common/BreadCrumb";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Flatpickr from "react-flatpickr";
 import Swal from "sweetalert2";
 import {
+  useAddComplainMutation,
+  useDeleteComplainMutation,
   useFetchComplainQuery,
-  useUpdateComplainMutation,
   useUpdateComplainResponseMutation,
+  Complain,
+  useUpdateComplainToPushedMutation,
 } from "features/complains/complainSlice";
+import { pdfjs } from "react-pdf";
+import { Document, Page } from "react-pdf";
+import "@react-pdf-viewer/core/lib/styles/index.css";
 
 const paragraphStyles = {
   WebkitLineClamp: 2,
@@ -25,21 +31,151 @@ const paragraphStyles = {
   overflow: "hidden",
   display: "-webkit-box",
 };
+
 const Claims = () => {
+  function convertToBase64(
+    file: File
+  ): Promise<{ base64Data: string; extension: string }> {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        const base64String = fileReader.result as string;
+        // const base64Data = base64String.split(",")[1]; // Extract only the Base64 data
+        const [, base64Data] = base64String.split(","); // Extract only the Base64 data
+        const extension = file.name.split(".").pop() ?? ""; // Get the file extension
+        resolve({ base64Data, extension });
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+      fileReader.readAsDataURL(file);
+    });
+  }
   document.title = "Complains | Bouden Coach Travel";
 
   const { data = [] } = useFetchComplainQuery();
   console.log(data);
   const [sendResponse] = useUpdateComplainResponseMutation();
+  const [addComplain] = useAddComplainMutation();
+  const [deleteComplain] = useDeleteComplainMutation();
+  const [pushedUpdate] = useUpdateComplainToPushedMutation();
   const Navigate = useNavigate();
 
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedComplaintId, setSelectedComplaintId] = useState<string>("");
+  console.log(selectedComplaintId)
+  // const [selectedFiles, setselectedFiles] = useState([]);
 
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const handleDateChange = (selectedDates: Date[]) => {
+    // Assuming you only need the first selected date
+    setSelectedDate(selectedDates[0]);
+  };
+  // Add New Complain
+  const [modal_AddComplainModals, setmodal_AddComplainModals] =
+    useState<boolean>(false);
+  function tog_AddComplainModals() {
+    setmodal_AddComplainModals(!modal_AddComplainModals);
+  }
 
   const handleOpenModal = (id: string) => {
     setSelectedComplaintId(id);
     setOpenModal(true);
+  };
+
+  // PDF
+  const handlePDFUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = (document.getElementById("pdfBase64String") as HTMLFormElement)
+      .files[0];
+    if (file) {
+      const { base64Data, extension } = await convertToBase64(file);
+      const newPDF = base64Data + "." + extension;
+      console.log("pdfExtension", extension);
+      setFormData({
+        ...formData,
+        pdf: newPDF,
+        pdfBase64String: base64Data,
+        pdfExtension: extension,
+      });
+    }
+  };
+  // Image
+  const handlePhotosUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = (
+      document.getElementById("photosBase64Strings") as HTMLFormElement
+    ).files[0];
+    if (file) {
+      const { base64Data, extension } = await convertToBase64(file);
+      const newPhotos = base64Data + "." + extension;
+      console.log("photoExtension", extension);
+      setFormData({
+        ...formData,
+        photo: newPhotos,
+        photoBase64Strings: base64Data,
+        photoExtension: extension,
+      });
+    }
+  };
+  // handle response photo upload
+  const handleResPhotosUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = (
+      document.getElementById("resPhotoBase64Strings") as HTMLFormElement
+    ).files[0];
+    if (file) {
+      const { base64Data, extension } = await convertToBase64(file);
+      const newPhotos = base64Data + "." + extension;
+      console.log("resPhotoExtension", extension);
+      setResData({
+        ...resData,
+        resPhoto: newPhotos,
+        resPhotoBase64Strings: base64Data,
+        ResPhotoExtension: extension,
+      });
+    }
+  };
+  // video upload
+  const handleVideoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = (
+      document.getElementById("videoBase64Strings") as HTMLFormElement
+    ).files[0];
+    if (file) {
+      const { base64Data, extension } = await convertToBase64(file);
+      const newPhotos = base64Data + "." + extension;
+      console.log("videoExtension", extension);
+      setFormData({
+        ...formData,
+        video: newPhotos,
+        videoBase64Strings: base64Data,
+        videoExtension: extension,
+      });
+    }
+  };
+  // handle response video upload
+  const handleResVideoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = (
+      document.getElementById("resVideoBase64Strings") as HTMLFormElement
+    ).files[0];
+    if (file) {
+      const { base64Data, extension } = await convertToBase64(file);
+      const newPhotos = base64Data + "." + extension;
+      console.log("ResVideoExtension", extension);
+      setResData({
+        ...resData,
+        resVideo: newPhotos,
+        resVideoBase64Strings: base64Data,
+        ResVideoExtension: extension,
+      });
+    }
   };
 
   const [formData, setFormData] = useState({
@@ -48,83 +184,155 @@ const Claims = () => {
     id_corporate: "",
     id_student: "",
     id_parent: "",
-    id_employee: {
-      email: "",
-      firstName: "",
-      lastName: "",
-      mobile: "",
-      photos: "",
-    },
     subject: "",
     description: "",
     complainDate: "",
     responseAuthor: "",
     responseDate: "",
     status: "",
-    mediaBase64String: "",
-    mediaExtension: "",
+    pdf: "",
+    pdfBase64String: "",
+    pdfExtension: "",
+    photo: "",
+    photoBase64Strings: "",
+    photoExtension: "",
+    video: "",
+    videoBase64Strings: "",
+    videoExtension: "",
     createdAt: "",
     updatedAt: "",
+    resPhoto: "",
+    resVideo: "",
+    resPhotoBase64Strings: "",
+    resVideoBase64Strings: "",
+    ResPhotoExtension: "",
+    ResVideoExtension: "",
   });
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     setFormData((prevState) => ({
       ...prevState,
       [e.target.id]: e.target.value,
     }));
   };
 
+  const onSubmitComplain = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    formData["complainDate"] = selectedDate!.toDateString();
+    addComplain(formData).then(() => setFormData(formData));
+    notify();
+    tog_AddComplainModals();
+  };
+
   useEffect(() => {
     if (selectedComplaintId) {
       // Find the complaint object with the selected _id from the data array
-      const selectedComplaint = data.find(complaint => complaint._id === selectedComplaintId);
-      
+      const selectedComplaint = data.find(
+        (complaint) => complaint._id === selectedComplaintId
+      );
+
       // Update the formData state with the selected _id
-      setFormData(prevState => ({
+      setFormData((prevState) => ({
         ...prevState,
         _id: selectedComplaint ? selectedComplaint._id : "",
       }));
     }
   }, [selectedComplaintId, data]);
+  const initialResState = {
+    _id: "",
+    responseMessage: "",
+    id_corporate: "",
+    id_student: "",
+    id_parent: "",
+    subject: "",
+    description: "",
+    complainDate: "",
+    responseAuthor: "",
+    responseDate: "",
+    status: "",
+    pdf: "",
+    pdfBase64String: "",
+    pdfExtension: "",
+    photo: "",
+    photoBase64Strings: "",
+    photoExtension: "",
+    video: "",
+    videoBase64Strings: "",
+    videoExtension: "",
+    createdAt: "",
+    updatedAt: "",
+    resPhoto: "",
+    resVideo: "",
+    resPhotoBase64Strings: "",
+    resVideoBase64Strings: "",
+    ResPhotoExtension: "",
+    ResVideoExtension: "",
+  };
+  const [resData, setResData] = useState(initialResState);
+  const onResChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setResData((prevState) => ({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }));
+  };
 
   const onSubmitResponse = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    const responseMessage = formData.get("responseMessage") as string;
-    const complaintId = formData.get("_id") as string;
-
-    const updatedFormData = {
-      _id: complaintId,
-      responseMessage: responseMessage,
-      id_corporate: "",
-      id_student: "",
-      id_parent: "",
-      id_employee: {
-        email: "",
-        firstName: "",
-        lastName: "",
-        mobile: "",
-        photos: "",
-      },
-      subject: "",
-      description: "",
-      complainDate: "",
-      responseAuthor: "",
-      responseDate: "",
-      status: "",
-      mediaBase64String: "",
-      mediaExtension: "",
-      createdAt: "",
-      updatedAt: "",
-        // Add other properties from formData as needed
-    };
-
-    sendResponse(updatedFormData).then(() => {
-        notify();
-        Navigate("/claims")
-
-    })
-};
+    resData["_id"] = selectedComplaintId;
+    // const formData = new FormData(e.target as HTMLFormElement);
+    // const responseMessage = formData.get("responseMessage") as string;
+    // const complaintId = formData.get("_id") as string;
+    // const resPhotoBase64Strings = formData.get("resPhotoBase64Strings") as string;
+    // const ResPhotoExtension = formData.get("ResPhotoExtension") as string;
+    // const resVideoBase64Strings = formData.get("resVideoBase64Strings") as string;
+    // const ResVideoExtension = formData.get("ResVideoExtension") as string;
+    // const updatedFormData = {
+    //   _id: complaintId,
+    //   responseMessage: responseMessage,
+    //   id_corporate: "",
+    //   id_student: "",
+    //   id_parent: "",
+    //   id_employee: {
+    //     email: "",
+    //     firstName: "",
+    //     lastName: "",
+    //     mobile: "",
+    //     photos: "",
+    //   },
+    //   subject: "",
+    //   description: "",
+    //   complainDate: "",
+    //   responseAuthor: "",
+    //   responseDate: "",
+    //   status: "",
+    //   pdf: "",
+    //   pdfBase64String: "",
+    //   pdfExtension: "",
+    //   createdAt: "",
+    //   updatedAt: "",
+    //   photo: "",
+    //   photoBase64Strings: "",
+    //   photoExtension: "",
+    //   video: "",
+    //   videoBase64Strings: "",
+    //   videoExtension: "",
+    //   resPhoto:"",
+    //   resVideo:"",
+    //   resPhotoBase64Strings:resPhotoBase64Strings,
+    //   resVideoBase64Strings:resVideoBase64Strings,
+    //   ResPhotoExtension:ResPhotoExtension,
+    //   ResVideoExtension:ResVideoExtension
+    // };
+    sendResponse(resData).then(() => {
+      notify();
+      Navigate("/claims");
+      setOpenModal(false);
+    });
+  };
   const notify = () => {
     Swal.fire({
       position: "center",
@@ -142,7 +350,7 @@ const Claims = () => {
     buttonsStyling: false,
   });
 
-  const deleteClaim = () => {
+  const deleteClaim = async (_id: any) => {
     swalWithBootstrapButtons
       .fire({
         title: "Are you sure?",
@@ -155,6 +363,7 @@ const Claims = () => {
       })
       .then((result: any) => {
         if (result.isConfirmed) {
+          deleteComplain(_id);
           swalWithBootstrapButtons.fire({
             title: "Archived!",
             text: "Your file has been archived.",
@@ -173,42 +382,117 @@ const Claims = () => {
       });
   };
 
-  // const answerClaims = async () => {
-  //   await Swal.fire({
-  //     title: "Submit your reply",
-  //     input: "textarea",
-  //     inputAttributes: {
-  //       autocapitalize: "off",
-  //     },
-  //     inputPlaceholder: "Type your message here...",
-  //     showCancelButton: true,
-  //     confirmButtonText: `
-  //   Send <i class="ri-send-plane-fill"></i>
-  // `,
-  //     showLoaderOnConfirm: true,
-  //     allowOutsideClick: () => !Swal.isLoading(),
-  //   }).then((result: any) => {
-  //     if (result.isConfirmed) {
-  //       Swal.fire({
-  //         title: `${result.value.login}'s avatar`,
-  //         imageUrl: result.value.avatar_url,
-  //       });
-  //     }
-  //   });
-  // };
+  const handlePushButtonClick = async (complaintId: string) => {
+    try {
+      await pushedUpdate({
+        _id: complaintId,
+        id_corporate: "",
+        id_student: "",
+        id_parent: "",
+        subject: "",
+        description: "",
+        complainDate: "",
+        responseMessage: "",
+        responseAuthor: "",
+        responseDate: "",
+        status: "",
+        pdf: "",
+        pdfBase64String: "",
+        pdfExtension: "",
+        createdAt: "",
+        updatedAt: "",
+        photo: "",
+        photoBase64Strings: "",
+        photoExtension: "",
+        video: "",
+        videoBase64Strings: "",
+        videoExtension: "",
+        resPhoto: "",
+        resVideo: "",
+        resPhotoBase64Strings: "",
+        resVideoBase64Strings: "",
+        ResPhotoExtension: "",
+        ResVideoExtension: "",
+      });
+      // Optionally, you can update your UI or perform additional actions after successful mutation
+    } catch (error) {
+      console.error("Error updating complain status:", error);
+      // Handle error
+    }
+  };
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showReadMoreButton, setShowReadMoreButton] = useState<boolean>(false);
 
   const ref = useRef<HTMLParagraphElement | null>(null);
 
+  const [openPdfModal, setOpenPdfModal] = useState<boolean>(false);
+  const [selectedPdf, setSelectedPdf] = useState<string>("");
+  const [selectedPhoto, setSelectedPhoto] = useState<string>("");
+  const [selectedVideo, setSelectedVideo] = useState<string>("");
+
+  const [modal_AddPdfModals, setmodal_AddPdfModals] = useState<boolean>(false);
+  function tog_AddPdfModals() {
+    setmodal_AddPdfModals(!modal_AddPdfModals);
+  }
+
+  if (pdfjs.GlobalWorkerOptions) {
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  }
+
+  //pdf viewer
+
+  const [numPages, setNumPages] = useState<number | null>(null);
+
+  const [showPdf, setShowPdf] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [photoUrl, setPhotoUrl] = useState<string>("");
+  const [videoUrl, setVideoUrl] = useState<string>("");
   useEffect(() => {
-    if (ref.current) {
-      setShowReadMoreButton(
-        ref.current.scrollHeight !== ref.current.clientHeight
-      );
+    if (pdfUrl !== "") {
+      window.open(pdfUrl);
     }
-  }, []);
+  }, [pdfUrl]);
+
+  useEffect(() => {
+    if (photoUrl !== "") {
+      window.open(photoUrl);
+    }
+  }, [photoUrl]);
+
+  useEffect(() => {
+    if (videoUrl !== "") {
+      window.open(videoUrl);
+    }
+  }, [videoUrl]);
+
+  // const handleOpenPdfModal = (PDF: React.SetStateAction<string>) => {
+  //   setSelectedPdf(PDF);
+  //   tog_AddPdfModals();
+  //   // setOpenPdfModal(true);
+  // };
+  // const handleOpenPhotoModal = (PHOTO: React.SetStateAction<string>) => {
+  //   setSelectedPdf(PHOTO);
+  //   tog_AddPdfModals();
+  //   // setOpenPdfModal(true);
+  // };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+  };
+
+  const openPdfInNewTab = (PDF: string) => {
+    setSelectedPdf(PDF);
+    setPdfUrl(`http://localhost:8800/complainFiles/pdf/${PDF}`);
+  };
+  const openPhotoInNewTab = (PHOTO: string) => {
+    setSelectedPhoto(PHOTO);
+    setPhotoUrl(`http://localhost:8800/complainFiles/photos/${PHOTO}`);
+  };
+  const openVideoInNewTab = (VIDEO: string) => {
+    setSelectedVideo(VIDEO);
+    setVideoUrl(`http://localhost:8800/complainFiles/videos/${VIDEO}`);
+  };
 
   return (
     <React.Fragment>
@@ -254,6 +538,7 @@ const Claims = () => {
                       <Button
                         variant="light"
                         className="add-btn text-dark ms-auto"
+                        onClick={() => tog_AddComplainModals()}
                       >
                         <i className="ph ph-export me-1 align-middle"></i> Write
                         a Complain
@@ -267,45 +552,77 @@ const Claims = () => {
           <Row>
             <div className="col-12">
               <Row>
-                {data.map((complaint) => (
-                  <Col xxl={4}>
-                    <Card key={complaint._id}>
+                {data.map((complaint: Complain) => (
+                  <Col xxl={4} key={complaint._id}>
+                    <Card>
                       <Card.Header>
                         {complaint.status && complaint.status === "pending" ? (
-                          <Link
-                            to="#"
-                            className="link-info fw-medium float-end"
-                            onClick={() => handleOpenModal(complaint._id)}
-                          >
-                            Answer
-                          </Link>
+                          <>
+                            <Button
+                              type="button"
+                              onClick={() => handleOpenModal(complaint._id)}
+                              className="btn btn-soft-secondary fw-medium float-end m-1"
+                            >
+                              <i className="bi bi-envelope-arrow-up label-icon align-middle fs-16 me-2"></i>
+                              Answer
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                handlePushButtonClick(complaint._id)
+                              }
+                              className="btn btn-soft-info fw-medium float-end m-1"
+                            >
+                              Push
+                            </Button>
+                          </>
                         ) : (
+                          // <Link
+                          //   to="#"
+                          //   className="link-danger fw-medium float-end"
+                          //   onClick={() => deleteClaim(complaint._id)}
+                          // >
+                          //   Archive
+                          // </Link>
                           <Link
                             to="#"
                             className="link-danger fw-medium float-end"
-                            onClick={deleteClaim}
+                            onClick={() => deleteClaim(complaint._id)}
                           >
-                            Archive
+                            {complaint.status === "pushed" ? (
+                              <>
+                                Archive
+                                <span className="badge badge-gradient-danger m-1">
+                                  Pushed
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                Archive
+                                <span className="badge badge-gradient-primary m-1">
+                                  Answered
+                                </span>
+                              </>
+                            )}
                           </Link>
                         )}
-
                         <h5 className="card-title mb-0">
                           <img
-                            src={`http://localhost:8800/employeeFiles/${complaint.id_employee.photos}`}
+                            src={`http://localhost:8800/employeeFiles/${complaint?.id_employee?.photos!}`}
                             alt=""
                             className="rounded-5 avatar-sm"
                           />{" "}
                           {complaint?.id_employee?.firstName!}{" "}
                           {complaint?.id_employee?.lastName!}
-                          <span className="badge bg-success align-middle fs-10">
+                          {/* <span className="badge bg-success align-middle fs-10">
                             {complaint.status}
-                          </span>
+                          </span> */}
                         </h5>
                         <h6 className="text-muted mt-1">
                           {complaint?.id_employee?.email!}
                         </h6>
                         <h6 className="text-muted mt-1">
-                          {complaint.id_employee.mobile}
+                          {complaint?.id_employee?.mobile!}
                         </h6>
                       </Card.Header>
                       <Card.Body key={complaint._id}>
@@ -339,49 +656,61 @@ const Claims = () => {
                             </Table>
                           </div>
                         </div>
-                        {/* <div className="text-end">
-                          {showReadMoreButton && (
-                            <Link
-                              to="#"
-                              className="link-dark fw-medium"
-                              onClick={() => setIsOpen(!isOpen)}
-                            >
-                              {isOpen ? (
-                                <i className="ri-arrow-up-s-line align-middle"></i>
-                              ) : (
-                                <i className="ri-arrow-down-s-line align-middle"></i>
-                              )}
-                            </Link>
-                          )}
-                        </div> */}
                       </Card.Body>
                       <Card.Footer className="p-0">
-                        <Col
-                          xxl={6}
-                          className="hstack flex-wrap gap-1  ml-1 mb-0 mb-lg-0 align-items"
-                        >
-                          <button
-                            type="button"
-                            className="btn btn-soft-primary btn-icon btn-border"
+                        <Row className="m-1">
+                          <Col
+                            lg={8}
+                            className="hstack flex-wrap gap-2 ml-1 mb-0 mb-lg-0"
                           >
-                            <i className="bi bi-file-earmark-image"></i>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-soft-success btn-icon btn-border"
-                          >
-                            <i className="bi bi-file-earmark-play"></i>
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-soft-danger btn-icon btn-border"
-                          >
-                            <i className="bi bi-file-pdf"></i>
-                          </button>
-                          <p className="justify-content-end">
-                            {complaint.createdAt}
-                          </p>
-                        </Col>
+                            {complaint?.photo[0]!.slice(41) === "" ? (
+                              ""
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-soft-primary btn-icon btn-border"
+                                // onClick={() =>
+                                //   complaint.photos &&
+                                //   handleOpenPhotoModal(complaint.photos)
+                                // }
+                                onClick={() =>
+                                  openPhotoInNewTab(complaint?.photo)
+                                }
+                              >
+                                <i className="bi bi-file-earmark-image"></i>
+                              </button>
+                            )}
+                            {complaint?.video!.slice(41) === "" ? (
+                              ""
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-soft-success btn-icon btn-border"
+                                onClick={() =>
+                                  openVideoInNewTab(complaint.video)
+                                }
+                              >
+                                <i className="bi bi-file-earmark-play"></i>
+                              </button>
+                            )}
+                            {complaint?.pdf!.slice(41) === "" ? (
+                              ""
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-soft-danger btn-icon btn-border"
+                                onClick={() => openPdfInNewTab(complaint.pdf)}
+                              >
+                                <i className="bi bi-file-pdf"></i>
+                              </button>
+                            )}
+                          </Col>
+                          <Col lg={4}>
+                            <p className="justify-content-end">
+                              {complaint.createdAt}
+                            </p>
+                          </Col>
+                        </Row>
                       </Card.Footer>
                     </Card>
                   </Col>
@@ -389,6 +718,7 @@ const Claims = () => {
               </Row>
             </div>
           </Row>
+          {/* modal response */}
           <Modal
             show={openModal}
             onHide={() => {
@@ -398,14 +728,14 @@ const Claims = () => {
             id="createModal"
             className="zoomIn border-0"
             centered
-            selectedComplaintId={selectedComplaintId}
+            selectedcomplaintid={selectedComplaintId}
           >
             <Modal.Header className="px-4 pt-4" closeButton>
               <h5 className="modal-title fs-18"></h5>
             </Modal.Header>
             <Modal.Body className="p-4">
               <Form className="create-form" onSubmit={onSubmitResponse}>
-  <input type="hidden" name="_id" id="_id"  value={formData._id} />
+                <input type="hidden" name="_id" id="_id" value={formData._id} />
                 <input type="hidden" id="id-field" />
                 <div
                   id="alert-error-msg"
@@ -423,31 +753,55 @@ const Claims = () => {
                         className="form-control"
                         id="responseMessage"
                         name="responseMessage"
-                        value={formData.responseMessage}
-                        onChange={onChange}
+                        value={resData.responseMessage}
+                        onChange={onResChange}
                       />
                     </div>
                   </Col>
-                  <Col lg={3}>
-                    <div className="mb-3">
-                      <label
-                        htmlFor="legalcardBase64String"
-                        className="form-label"
-                      >
-                        Attached
-                      </label>
-                      <Form.Control
-                        name="legalcardBase64String"
-                        type="file"
-                        id="legalcardBase64String"
-                        accept=".pdf"
-                        placeholder="Choose File"
-                        className="text-muted"
-
-                        // required
-                      />
-                    </div>
-                  </Col>
+                  <Row>
+                    <Col lg={10}>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="resPhotoBase64Strings"
+                          className="form-label"
+                        >
+                          Images
+                        </label>
+                        <Form.Control
+                          name="resPhotoBase64Strings"
+                          onChange={handleResPhotosUpload}
+                          type="file"
+                          id="resPhotoBase64Strings"
+                          accept=".png, .jpeg, .jpg"
+                          placeholder="Choose Images"
+                          className="text-muted"
+                          multiple
+                        />
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col lg={10}>
+                      <div className="mb-3">
+                        <label
+                          htmlFor="resVideoBase64Strings"
+                          className="form-label"
+                        >
+                          Video
+                        </label>
+                        <Form.Control
+                          name="resVideoBase64Strings"
+                          onChange={handleResVideoUpload}
+                          type="file"
+                          id="resVideoBase64Strings"
+                          accept=".MKV, .WEBM, .M4V, .MP4, .AVI, .MOV, .MPG, .MPA, .ASF, .WMA, .MP2, M2P, MP3, DIF.Rare, .VOB"
+                          placeholder="Choose Video"
+                          className="text-muted"
+                          multiple
+                        />
+                      </div>
+                    </Col>
+                  </Row>
                   <Col lg={12}>
                     <div className="hstack gap-2 justify-content-end">
                       <Button
@@ -462,7 +816,6 @@ const Claims = () => {
                         id="addNew"
                         className="btn btn-primary"
                         type="submit"
-                        onClick={()=>setOpenModal(false)}
                       >
                         Send
                       </Button>
@@ -472,6 +825,201 @@ const Claims = () => {
               </Form>
             </Modal.Body>
           </Modal>
+          {/* modal new complain */}
+          <Modal
+            className="fade zoomIn"
+            size="lg"
+            show={modal_AddComplainModals}
+            onHide={() => {
+              tog_AddComplainModals();
+            }}
+            centered
+          >
+            <Modal.Header className="px-4 pt-4" closeButton>
+              <h5 className="modal-title fs-18" id="exampleModalLabel">
+                write your complaint
+              </h5>
+            </Modal.Header>
+            <Modal.Body className="p-4">
+              <div
+                id="alert-error-msg"
+                className="d-none alert alert-danger py-2"
+              ></div>
+              <Form className="tablelist-form" onSubmit={onSubmitComplain}>
+                <input type="hidden" id="id-field" />
+                <Row>
+                  <Col lg={6}>
+                    <div className="mb-3">
+                      <Form.Label htmlFor="subject"> Subject</Form.Label>
+                      <Form.Control
+                        type="text"
+                        id="subject"
+                        placeholder="Enter complaint subject"
+                        required
+                        value={formData.subject}
+                        onChange={onChange}
+                      />
+                    </div>
+                  </Col>
+                  <Col lg={3}>
+                    <div className="mb-3">
+                      <Form.Label htmlFor="complainDate">
+                        Complain Date
+                      </Form.Label>
+                      <Flatpickr
+                        value={selectedDate!}
+                        onChange={handleDateChange}
+                        className="form-control flatpickr-input"
+                        placeholder="Select Date"
+                        options={{
+                          dateFormat: "d M, Y",
+                        }}
+                        id="complainDate"
+                      />
+                      {/* <p>{selectedDate?.toDateString()}</p> */}
+                    </div>
+                  </Col>
+
+                  <div className="col-lg-10">
+                    <div className="mb-3">
+                      <Form.Label htmlFor="description">
+                        {" "}
+                        Description
+                      </Form.Label>
+                      <textarea
+                        // type="Message"
+                        className="form-control"
+                        rows={3}
+                        id="description"
+                        placeholder="Enter Body Message"
+                        value={formData.description}
+                        onChange={onChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Col lg={10}>
+                    <div className="mb-3">
+                      <label htmlFor="pdfBase64String" className="form-label">
+                        PDF
+                      </label>
+                      <Form.Control
+                        name="pdfBase64String"
+                        onChange={handlePDFUpload}
+                        type="file"
+                        id="pdfBase64String"
+                        accept=".pdf"
+                        placeholder="Choose File"
+                        className="text-muted"
+
+                        // required
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg={10}>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="photosBase64Strings"
+                        className="form-label"
+                      >
+                        Images
+                      </label>
+                      <Form.Control
+                        name="photosBase64Strings"
+                        onChange={handlePhotosUpload}
+                        type="file"
+                        id="photosBase64Strings"
+                        accept=".png, .jpeg, .jpg"
+                        placeholder="Choose Images"
+                        className="text-muted"
+                        multiple
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg={10}>
+                    <div className="mb-3">
+                      <label
+                        htmlFor="photosBase64Strings"
+                        className="form-label"
+                      >
+                        Video
+                      </label>
+                      <Form.Control
+                        name="videoBase64Strings"
+                        onChange={handleVideoUpload}
+                        type="file"
+                        id="videoBase64Strings"
+                        accept=".MKV, .WEBM, .M4V, .MP4, .AVI, .MOV, .MPG, .MPA, .ASF, .WMA, .MP2, M2P, MP3, DIF.Rare, .VOB"
+                        placeholder="Choose Video"
+                        className="text-muted"
+                        multiple
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg={12}>
+                    <div className="hstack gap-2 justify-content-end">
+                      <Button
+                        className="btn-ghost-danger"
+                        onClick={() => {
+                          tog_AddComplainModals();
+                        }}
+                        data-bs-dismiss="modal"
+                      >
+                        <i className="ri-close-line align-bottom me-1"></i>{" "}
+                        Close
+                      </Button>
+                      <Button variant="primary" id="add-btn" type="submit">
+                        Send
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+              </Form>
+            </Modal.Body>
+          </Modal>
+          {/* modal open pdf  */}
+          <Modal
+            className="fade zoomIn"
+            size="lg"
+            show={modal_AddPdfModals}
+            onHide={() => {
+              tog_AddPdfModals();
+            }}
+            centered
+            // selectedPdf={selectedPdf}
+          >
+            <Modal.Header className="px-4 pt-4" closeButton>
+              <h5 className="modal-title fs-18" id="exampleModalLabel">
+                PDF files
+              </h5>
+            </Modal.Header>
+            <Modal.Body className="p-4">
+              <div
+                id="alert-error-msg"
+                className="d-none alert alert-danger py-2"
+              ></div>
+              {selectedPdf && selectedPdf !== "" ? (
+                <div>
+                  <Document
+                    file={`${selectedPdf}`}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                  >
+                    <Page pageNumber={1} />
+                  </Document>
+                </div>
+              ) : (
+                <div className="text-center p-3">
+                  No PDF file is available to display.
+                </div>
+              )}
+            </Modal.Body>
+          </Modal>
         </Container>
       </div>
     </React.Fragment>
@@ -479,3 +1027,10 @@ const Claims = () => {
 };
 
 export default Claims;
+function convertToBase64(
+  file: any
+):
+  | { base64Data: any; extension: any }
+  | PromiseLike<{ base64Data: any; extension: any }> {
+  throw new Error("Function not implemented.");
+}

@@ -188,7 +188,7 @@ const SatisfactionChart = ({ dataColors }: any) => {
 
 const TopCategoriesChart = ({ dataColors }: any) => {
     const topCategoriesChartsColors = getChartColorsArray(dataColors)
-    const series = [85, 69, 45, 78];
+    const series = [100, 55, 45, 20];
     var options = {
         chart: {
             height: 300,
@@ -210,7 +210,7 @@ const TopCategoriesChart = ({ dataColors }: any) => {
                     },
                     total: {
                         show: true,
-                        label: 'Sales',
+                        label: 'Payment',
                         formatter: function (w: any) {
                             return 2922
                         }
@@ -218,7 +218,7 @@ const TopCategoriesChart = ({ dataColors }: any) => {
                 }
             }
         },
-        labels: ['Fashion', 'Electronics', 'Groceries', 'Others'],
+        labels: ['Total', 'Paid', 'unpaid', 'This Month'],
         colors: topCategoriesChartsColors,
         legend: {
             show: false,

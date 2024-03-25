@@ -1,3 +1,6 @@
+import { useFetchComplainQuery } from 'features/complains/complainSlice';
+import { useFetchEmployeeQuery } from 'features/employees/employeesSlice';
+import { useFetchGroupQuery } from 'features/groups/groupsSlice';
 import React from 'react';
 import { Card, Col } from 'react-bootstrap';
 import CountUp from 'react-countup';
@@ -5,48 +8,62 @@ import CountUp from 'react-countup';
 interface WidgetsProps {
     id : number;
     name : string;
-    amount : number;
-    decimal ?: number;
+    amount : string;
+    
     perstange : string;
     badgeColor : string;
     icon : string;
     iconColor : string;
 }
 const Widgets = () => {
+   
+    const{data:GroupNumber=[]}=useFetchGroupQuery();
+    const {data:EmployeeNumber=[]}= useFetchEmployeeQuery();
+    const {data:ComplainNumber=[]}=useFetchComplainQuery();
+
+    let ActiveGroups= GroupNumber.filter((groups)=>groups.status === "Active")
+    let ActiveEmployees= EmployeeNumber.filter((employees)=>employees.status === "Active")
+    let PendingComplains= ComplainNumber.filter((complains)=>complains.status=== "pending")
+
+
+    const countGroup = (groups: any[]) => groups.length;
+    const countEmployee = (employee: any[]) => employee.length;
+    const countComplain =(complain:any[])=>complain.length;
+
+
 
     const widgetsData : Array<WidgetsProps> = [
         {
             id : 1,
-            name : "TOTAL EARNINGS",
-            amount : 98851.35,
-            decimal : 2,
+            name : "GROUPS",
+            amount : `${ActiveGroups.length}` +"/" +`${countGroup(GroupNumber)}`,
             perstange : "+18.30",
             badgeColor : "success",
-            icon : "ph-wallet",
+            icon : "bi bi-people-fill",
             iconColor : "secondary"
         },
         {
             id : 2,
-            name : "ORDERS",
-            amount : 65802,
+            name : "EMPLOYEES",
+            amount : `${ActiveEmployees.length}` +"/" +`${countEmployee(EmployeeNumber)}`,
             perstange : "-2.74",
             badgeColor : "danger",
-            icon : "ph-storefront",
+            icon : "bi bi-person-vcard",
             iconColor : "info"
         },
         {
             id : 3,
-            name : "CUSTOMERS",
-            amount : 79958,
+            name : "COMPLAINS",
+            amount : `${PendingComplains.length}` +"/" +`${countComplain(ComplainNumber)}`,
             perstange : "+29.08",
             badgeColor : "success",
-            icon : "ph-user-circle",
+            icon : "bi bi-chat-left-quote-fill",
             iconColor : "warning"
         },
         {
             id : 4,
-            name : "PRODUCTS",
-            amount : 36758,
+            name : "ALL TRIPS",
+            amount : "36758",
             perstange : "+1.67",
             badgeColor : "success",
             icon : "ph-sketch-logo",
@@ -64,14 +81,14 @@ const Widgets = () => {
                             <div className="flex-grow-1 ms-3">
                                 <p className="text-uppercase fw-medium text-muted fs-14 text-truncate">{item.name}</p>
                                 <h4 className="fs-22 fw-semibold mb-3">{item.decimal ? "$" : ""}<span className="counter-value" data-target="98851.35">
-                                    <CountUp start={0} end={item.amount} separator="," decimals={item.decimal && 2} />
+                                {item.amount}
                                     </span></h4>
-                                <div className="d-flex align-items-center gap-2">
+                                {/* <div className="d-flex align-items-center gap-2">
                                     <h5 className={"mb-0 badge bg-" + item.badgeColor + "-subtle text-" + item.badgeColor}>
                                         <i className={item.badgeColor === "success" ? "ri-arrow-right-up-line align-bottom" : "ri-arrow-right-down-line align-bottom"}></i> {item.perstange} %
                                     </h5>
                                     <p className="text-muted mb-0">than last week</p>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="avatar-sm flex-shrink-0">
                                 <span className={"avatar-title bg-" + item.iconColor + "-subtle text-" + item.iconColor + " rounded fs-3"}>
