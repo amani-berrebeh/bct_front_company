@@ -229,12 +229,13 @@ const Navdata = () => {
             },
             stateVariables: isPayments,
             subItems: [
-                { id: "level1.1", label: "Claims", link: "/claims", icon: "bi bi-chat-square-quote", parentId: "Payments" },
+              
 
                 { id: "level1.3", label: "Finance", link: "/payment-employee", icon: "bi bi-currency-pound", parentId: "Payments" },
                 { id: "level1.3", label: "Reporting", link: "/reporting", icon: "bi bi-graph-up-arrow", parentId: "Payments" },
                 { id: "level1.3", label: "Extra Trips", icon: "bi bi-car-front", link: "/payment-management", parentId: "Payments" },
                 { id: "level1.3", label: "Delays & Changes", link: "/delays&changes", parentId: "Payments", icon: "bi bi-sign-turn-right-fill" },
+                { id: "level1.1", label: "Archived Complains", link: "/complains/archive", icon: "bi bi-chat-square-quote", parentId: "Payments" },
             ],
         },
 

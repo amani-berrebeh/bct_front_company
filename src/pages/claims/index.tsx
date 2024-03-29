@@ -20,6 +20,7 @@ import {
   useUpdateComplainResponseMutation,
   Complain,
   useUpdateComplainToPushedMutation,
+  useUpdateComplainToArchivedMutation,
 } from "features/complains/complainSlice";
 import { pdfjs } from "react-pdf";
 import { Document, Page } from "react-pdf";
@@ -59,11 +60,25 @@ const Claims = () => {
   const [addComplain] = useAddComplainMutation();
   const [deleteComplain] = useDeleteComplainMutation();
   const [pushedUpdate] = useUpdateComplainToPushedMutation();
+  const [archivedUpdate] = useUpdateComplainToArchivedMutation();
   const Navigate = useNavigate();
-
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  // display complain according to status pending or answered or all complains
+  const [selectedStatus, setSelectedStatus] = useState('');
+ // Function to handle status change
+ const handleStatusChange = (event:any) => {
+  setSelectedStatus(event.target.value);
+};
+ // Function to filter data based on the selected status
+ const filteredData = data.filter((complaint) => {
+  if (selectedStatus === '') {
+    return complaint.archived !== 'yes'; // Show complaints that are not archived
+  } else {
+    return complaint.status === selectedStatus && complaint.archived !== 'yes'; // Show complaints with selected status and not archived
+  }
+});
+    const [openModal, setOpenModal] = useState<boolean>(false);
   const [selectedComplaintId, setSelectedComplaintId] = useState<string>("");
-  console.log(selectedComplaintId)
+  console.log(selectedComplaintId);
   // const [selectedFiles, setselectedFiles] = useState([]);
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -190,6 +205,7 @@ const Claims = () => {
     responseAuthor: "",
     responseDate: "",
     status: "",
+    archived: "",
     pdf: "",
     pdfBase64String: "",
     pdfExtension: "",
@@ -252,6 +268,7 @@ const Claims = () => {
     responseAuthor: "",
     responseDate: "",
     status: "",
+    archived: "",
     pdf: "",
     pdfBase64String: "",
     pdfExtension: "",
@@ -283,50 +300,7 @@ const Claims = () => {
   const onSubmitResponse = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     resData["_id"] = selectedComplaintId;
-    // const formData = new FormData(e.target as HTMLFormElement);
-    // const responseMessage = formData.get("responseMessage") as string;
-    // const complaintId = formData.get("_id") as string;
-    // const resPhotoBase64Strings = formData.get("resPhotoBase64Strings") as string;
-    // const ResPhotoExtension = formData.get("ResPhotoExtension") as string;
-    // const resVideoBase64Strings = formData.get("resVideoBase64Strings") as string;
-    // const ResVideoExtension = formData.get("ResVideoExtension") as string;
-    // const updatedFormData = {
-    //   _id: complaintId,
-    //   responseMessage: responseMessage,
-    //   id_corporate: "",
-    //   id_student: "",
-    //   id_parent: "",
-    //   id_employee: {
-    //     email: "",
-    //     firstName: "",
-    //     lastName: "",
-    //     mobile: "",
-    //     photos: "",
-    //   },
-    //   subject: "",
-    //   description: "",
-    //   complainDate: "",
-    //   responseAuthor: "",
-    //   responseDate: "",
-    //   status: "",
-    //   pdf: "",
-    //   pdfBase64String: "",
-    //   pdfExtension: "",
-    //   createdAt: "",
-    //   updatedAt: "",
-    //   photo: "",
-    //   photoBase64Strings: "",
-    //   photoExtension: "",
-    //   video: "",
-    //   videoBase64Strings: "",
-    //   videoExtension: "",
-    //   resPhoto:"",
-    //   resVideo:"",
-    //   resPhotoBase64Strings:resPhotoBase64Strings,
-    //   resVideoBase64Strings:resVideoBase64Strings,
-    //   ResPhotoExtension:ResPhotoExtension,
-    //   ResVideoExtension:ResVideoExtension
-    // };
+
     sendResponse(resData).then(() => {
       notify();
       Navigate("/claims");
@@ -396,6 +370,7 @@ const Claims = () => {
         responseAuthor: "",
         responseDate: "",
         status: "",
+        archived: "",
         pdf: "",
         pdfBase64String: "",
         pdfExtension: "",
@@ -414,13 +389,75 @@ const Claims = () => {
         ResPhotoExtension: "",
         ResVideoExtension: "",
       });
-      // Optionally, you can update your UI or perform additional actions after successful mutation
     } catch (error) {
       console.error("Error updating complain status:", error);
       // Handle error
     }
   };
-
+  
+  const handleArchiveButtonClick = async (complaintId: string) => {
+    try {
+      // Show SweetAlert confirmation dialog with OK and Cancel buttons
+      const result = await Swal.fire({
+        icon: 'question',
+        title: 'Are you sure you want to archive this complaint?',
+        showCancelButton: true,
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel'
+      });
+  
+      // If user clicked OK, proceed with the archive operation
+      if (result.isConfirmed) {
+        await archivedUpdate({
+          
+                  _id: complaintId,
+                  id_corporate: "",
+                  id_student: "",
+                  id_parent: "",
+                  subject: "",
+                  description: "",
+                  complainDate: "",
+                  responseMessage: "",
+                  responseAuthor: "",
+                  responseDate: "",
+                  status: "",
+                  archived: "",
+                  pdf: "",
+                  pdfBase64String: "",
+                  pdfExtension: "",
+                  createdAt: "",
+                  updatedAt: "",
+                  photo: "",
+                  photoBase64Strings: "",
+                  photoExtension: "",
+                  video: "",
+                  videoBase64Strings: "",
+                  videoExtension: "",
+                  resPhoto: "",
+                  resVideo: "",
+                  resPhotoBase64Strings: "",
+                  resVideoBase64Strings: "",
+                  ResPhotoExtension: "",
+                  ResVideoExtension: "",
+          
+        });
+  
+        // Show success message after archiving
+        Swal.fire({
+          icon: 'success',
+          title: 'Complaint archived successfully!',
+          showConfirmButton: false,
+          timer: 1500
+        });
+      } else {
+        // User clicked Cancel or closed the dialog
+        console.log('Archive operation cancelled');
+      }
+    } catch (error) {
+      console.error("Error updating complain status:", error);
+      // Handle error
+    }
+  };
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showReadMoreButton, setShowReadMoreButton] = useState<boolean>(false);
 
@@ -430,6 +467,8 @@ const Claims = () => {
   const [selectedPdf, setSelectedPdf] = useState<string>("");
   const [selectedPhoto, setSelectedPhoto] = useState<string>("");
   const [selectedVideo, setSelectedVideo] = useState<string>("");
+  const [selectedResPhoto, setSelectedResPhoto] = useState<string>("");
+  const [selectedResVideo, setSelectedResVideo] = useState<string>("");
 
   const [modal_AddPdfModals, setmodal_AddPdfModals] = useState<boolean>(false);
   function tog_AddPdfModals() {
@@ -448,6 +487,8 @@ const Claims = () => {
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [photoUrl, setPhotoUrl] = useState<string>("");
   const [videoUrl, setVideoUrl] = useState<string>("");
+  const [resPhotoUrl, setResPhotoUrl] = useState<string>("");
+  const [resVideoUrl, setResVideoUrl] = useState<string>("");
   useEffect(() => {
     if (pdfUrl !== "") {
       window.open(pdfUrl);
@@ -465,6 +506,17 @@ const Claims = () => {
       window.open(videoUrl);
     }
   }, [videoUrl]);
+
+  useEffect(() => {
+    if (resVideoUrl !== "") {
+      window.open(resVideoUrl);
+    }
+  }, [resVideoUrl]);
+  useEffect(() => {
+    if (resPhotoUrl !== "") {
+      window.open(resPhotoUrl);
+    }
+  }, [resPhotoUrl]);
 
   // const handleOpenPdfModal = (PDF: React.SetStateAction<string>) => {
   //   setSelectedPdf(PDF);
@@ -493,27 +545,25 @@ const Claims = () => {
     setSelectedVideo(VIDEO);
     setVideoUrl(`http://localhost:8800/complainFiles/videos/${VIDEO}`);
   };
+  const openResVideoInNewTab = (resVIDEO: string) => {
+    setSelectedResVideo(resVIDEO);
+    setResVideoUrl(`http://localhost:8800/complainFiles/resVideos/${resVIDEO}`);
+  };
+  const openResPhotoInNewTab = (resPHOTO: string) => {
+    setSelectedResPhoto(resPHOTO);
+    setResPhotoUrl(`http://localhost:8800/complainFiles/resPhotos/${resPHOTO}`);
+  };
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumb title="Claims" pageTitle="Feedback&Claims" />
+          <Breadcrumb title="Complains" pageTitle="Feedback&Complains" />
           <Row>
             <Card>
               <Card.Body>
                 <Row className="g-lg-2 g-4">
-                  <Col xxl={2} className="col-lg-auto">
-                    <select
-                      className="form-select text-muted"
-                      data-choices
-                      data-choices-search-false
-                      name="choices-single-default"
-                      id="idStatus"
-                    >
-                      <option value="all">All Categories</option>
-                    </select>
-                  </Col>
+                  
                   <Col xxl={2} lg={6}>
                     <select
                       className="form-select text-muted"
@@ -521,10 +571,13 @@ const Claims = () => {
                       data-choices-search-false
                       name="choices-single-default"
                       id="idStatus"
+                      onChange={handleStatusChange}
+                  value={selectedStatus}
                     >
-                      <option value="">Status</option>
-                      <option value="Pickups">Answered</option>
-                      <option value="Pending">Pending</option>
+                      <option value="">All Complains</option>
+                      <option value="answered">Answered</option>
+                      <option value="pending">Pending</option>
+                      <option value="pushed">Pushed</option>
                     </select>
                   </Col>
 
@@ -552,7 +605,7 @@ const Claims = () => {
           <Row>
             <div className="col-12">
               <Row>
-                {data.map((complaint: Complain) => (
+                {filteredData.map((complaint: Complain) => (
                   <Col xxl={4} key={complaint._id}>
                     <Card>
                       <Card.Header>
@@ -577,46 +630,52 @@ const Claims = () => {
                             </Button>
                           </>
                         ) : (
-                          // <Link
-                          //   to="#"
-                          //   className="link-danger fw-medium float-end"
-                          //   onClick={() => deleteClaim(complaint._id)}
-                          // >
-                          //   Archive
-                          // </Link>
                           <Link
                             to="#"
                             className="link-danger fw-medium float-end"
-                            onClick={() => deleteClaim(complaint._id)}
+                            onClick={() =>
+                              handleArchiveButtonClick(complaint._id)
+                            }
                           >
-                            {complaint.status === "pushed" ? (
+                            {complaint.archived === "yes" ? (
                               <>
-                                Archive
-                                <span className="badge badge-gradient-danger m-1">
-                                  Pushed
-                                </span>
+                                Archived
+                                {complaint.status === "pushed" ? (
+                                  <span className="badge badge-gradient-danger m-1">
+                                    Pushed
+                                  </span>
+                                ) : (
+                                  <span className="badge badge-gradient-primary m-1">
+                                    Answered
+                                  </span>
+                                )}
                               </>
                             ) : (
                               <>
                                 Archive
-                                <span className="badge badge-gradient-primary m-1">
-                                  Answered
-                                </span>
+                                {complaint.status === "pushed" && (
+                                  <span className="badge badge-gradient-danger m-1">
+                                    Pushed
+                                  </span>
+                                )}
+                                {complaint.status === "answered" && (
+                                  <span className="badge badge-gradient-primary m-1">
+                                    Answered
+                                  </span>
+                                )}
                               </>
                             )}
                           </Link>
                         )}
                         <h5 className="card-title mb-0">
                           <img
-                            src={`http://localhost:8800/employeeFiles/${complaint?.id_employee?.photos!}`}
+                            src={`http://localhost:8800/employeeFiles/${complaint
+                              ?.id_employee?.photos!}`}
                             alt=""
                             className="rounded-5 avatar-sm"
                           />{" "}
                           {complaint?.id_employee?.firstName!}{" "}
                           {complaint?.id_employee?.lastName!}
-                          {/* <span className="badge bg-success align-middle fs-10">
-                            {complaint.status}
-                          </span> */}
                         </h5>
                         <h6 className="text-muted mt-1">
                           {complaint?.id_employee?.email!}
@@ -652,6 +711,54 @@ const Claims = () => {
                                     {complaint.complainDate}
                                   </td>
                                 </tr>
+                                {complaint.status === "answered" ? (
+                                  <tr className="fw-bold">
+                                    <td> Response Message:</td>
+                                    <td className="fw-medium">
+                                      {complaint.responseMessage}
+                                    </td>
+                                    <td>
+                                      {complaint?.resPhoto!.slice(44) === "" ? (
+                                        ""
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          className="btn btn-primary position-relative p-1 avatar-xs rounded"
+                                          onClick={() =>
+                                            openResPhotoInNewTab(
+                                              complaint?.resPhoto
+                                            )
+                                          }
+                                        >
+                                          <span className="avatar-title bg-transparent">
+                                            <i className="bi bi-file-earmark-image"></i>
+                                          </span>
+                                          <span className="position-absolute top-0 start-100 translate-middle badge border border-light rounded-circle bg-danger p-1"></span>
+                                        </button>
+                                      )}
+                                      {complaint?.resVideo!.slice(44) === "" ? (
+                                        ""
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          className="btn btn-success position-relative p-1 m-1 avatar-xs rounded"
+                                          onClick={() =>
+                                            openResVideoInNewTab(
+                                              complaint?.resVideo
+                                            )
+                                          }
+                                        >
+                                          <span className="avatar-title bg-transparent">
+                                            <i className="bi bi-file-earmark-play"></i>
+                                          </span>
+                                          <span className="position-absolute top-0 start-100 translate-middle badge border border-light rounded-circle bg-danger p-1"></span>
+                                        </button>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ) : (
+                                  ""
+                                )}
                               </tbody>
                             </Table>
                           </div>
@@ -669,10 +776,6 @@ const Claims = () => {
                               <button
                                 type="button"
                                 className="btn btn-soft-primary btn-icon btn-border"
-                                // onClick={() =>
-                                //   complaint.photos &&
-                                //   handleOpenPhotoModal(complaint.photos)
-                                // }
                                 onClick={() =>
                                   openPhotoInNewTab(complaint?.photo)
                                 }
@@ -1027,10 +1130,4 @@ const Claims = () => {
 };
 
 export default Claims;
-function convertToBase64(
-  file: any
-):
-  | { base64Data: any; extension: any }
-  | PromiseLike<{ base64Data: any; extension: any }> {
-  throw new Error("Function not implemented.");
-}
+

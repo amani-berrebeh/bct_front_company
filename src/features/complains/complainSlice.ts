@@ -20,6 +20,7 @@ export interface Complain {
     responseAuthor:string,
     responseDate:string,
     status:string,
+    archived:string,
     pdf:string,
     pdfBase64String:string,
     pdfExtension:string,
@@ -38,17 +39,7 @@ export interface Complain {
     ResPhotoExtension:string,
     ResVideoExtension:string
 }
-// export interface ResComplain {
-//   _id:string,
-//   responseMessage:string,
-//   resPhoto:string,
-//     resVideo:string,
-//     resPhotoBase64Strings:string,
-//     resVideoBase64Strings:string,
-//     ResPhotoExtension:string,
-//     ResVideoExtension:string
 
-// }
 
 export const complainSlice = createApi({
     reducerPath: "Complain",
@@ -105,6 +96,16 @@ export const complainSlice = createApi({
             },
             invalidatesTags: ["Complain"],
           }),
+          updateComplainToArchived: builder.mutation<void, Complain>({
+            query:({_id})=> {
+              return {
+                url: "/updateToArchived",
+                method: "PUT",
+                body: {_id},
+              };
+            },
+            invalidatesTags: ["Complain"],
+          }),
         updateComplain: builder.mutation<void, Complain>({
           query: ({ _id, ...rest }) => ({
             url: `/updateComplain/${_id}`,
@@ -130,5 +131,6 @@ export const complainSlice = createApi({
     useDeleteComplainMutation,
     useUpdateComplainMutation,
     useUpdateComplainResponseMutation,
-    useUpdateComplainToPushedMutation
+    useUpdateComplainToPushedMutation,
+    useUpdateComplainToArchivedMutation
   } = complainSlice;

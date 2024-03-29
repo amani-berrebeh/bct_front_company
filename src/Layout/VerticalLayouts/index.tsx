@@ -151,7 +151,7 @@ const VerticalLayout = (props: any) => {
   }
 
   function tog_Claim() {
-    navigate("/claims");
+    navigate("/complains");
   }
 
   function tog_Contract() {

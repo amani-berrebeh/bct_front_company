@@ -4,12 +4,12 @@ import DataTable from "react-data-table-component";
 import Breadcrumb from "Common/BreadCrumb";
 import Flatpickr from "react-flatpickr";
 import { Link, useNavigate } from "react-router-dom";
-import { GoogleApiWrapper, Map, Marker } from "google-maps-react";
 import { useFetchProgramsQuery } from "features/program/programSlice";
 
-const LoadingContainer = () => <div>Loading...</div>;
-const ProgramList = (props: any) => {
+const ProgramList = () => {
   document.title = "List of Programs | Company";
+
+
   const [modal_Pickup, setmodal_Pickup] = useState<boolean>(false);
   const [modal_Destination, setmodal_Destination] = useState<boolean>(false);
   const { data = [] } = useFetchProgramsQuery();
@@ -121,7 +121,7 @@ const ProgramList = (props: any) => {
             </li>
             <li>
               <Link
-                to={`/program-details/${row.Name}`}
+                to={"/programming/list-of-programs/programDetail"}
                 className="badge badge-soft-primary edit-item-btn"
                 state={row}
               >
@@ -274,7 +274,7 @@ const ProgramList = (props: any) => {
             </Card>
           </Col>
         </Container>
-        <Modal
+        {/* <Modal
           className="fade zoomIn"
           size="xl"
           show={modal_Pickup}
@@ -293,8 +293,8 @@ const ProgramList = (props: any) => {
               <Marker position={{ lat: 52.477732, lng: -1.8988277 }} />
             </Map>
           </Modal.Body>
-        </Modal>
-        <Modal
+        </Modal> */}
+        {/* <Modal
           className="fade zoomIn"
           size="xl"
           show={modal_Destination}
@@ -313,13 +313,9 @@ const ProgramList = (props: any) => {
               <Marker position={{ lat: 53.166, lng: -4.3269 }} />
             </Map>
           </Modal.Body>
-        </Modal>
+        </Modal> */}
       </div>
     </React.Fragment>
   );
 };
-export default GoogleApiWrapper({
-  apiKey: "AIzaSyAbvyBxmMbFhrzP9Z8moyYr6dCr-pzjhBE",
-  LoadingContainer: LoadingContainer,
-  v: "3",
-})(ProgramList);
+export default ProgramList ;

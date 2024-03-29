@@ -82,7 +82,7 @@ interface stopTime {
   minutes: number;
 }
 
-const AddProgramm = (props: any) => {
+const AddProgramm = () => {
   document.title = "Program | School Administration";
   const navigate = useNavigate();
 

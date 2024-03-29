@@ -87,6 +87,9 @@ import ProgramList from "pages/Programming/programList";
 import ProgramClone from "pages/Programming/programList/ProgramClone";
 import ProgramDetails from "pages/Programming/programList/ProgramDetails";
 import AddProgramm from "pages/Programming/Programs";
+import ProgramDetail from "pages/Programming/programList/ProgramDetail";
+import ArchivedComplains from "pages/claims/ArchivedComplains";
+
 
 const authProtectedRoutes = [
   
@@ -110,6 +113,7 @@ const publicRoutes = [
   
   { path: "/programming/addProgram", component: < AddProgramm/> },
   { path: "/programming/list-of-programs", component: < ProgramList/> },
+  { path: "/programming/list-of-programs/programDetail", component: < ProgramDetail/> },
   { path: "/program/:name", component: < ProgramClone/> },
   { path: "/program-details/:name", component: < ProgramDetails/> },
 
@@ -153,8 +157,9 @@ const publicRoutes = [
 
    //? Claims
 
-{ path: "/claims", component: <Claims /> },
+{ path: "/complains", component: <Claims /> },
 { path: "/claim-detail", component: <ClaimDetails/> },
+{ path: "/complains/archive", component: <ArchivedComplains /> },
  //? Contract
  { path: "/contracts", component: <Contract /> },
 { path: "/contract-detail", component: <ContractDetails/> },

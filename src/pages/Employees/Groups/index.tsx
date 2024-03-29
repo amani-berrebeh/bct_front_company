@@ -22,8 +22,10 @@ import {
   GroupInterface,
   useAddGroupMutation,
 } from "features/groups/groupsSlice";
+import { useFetchProgramsQuery } from "features/program/programSlice";
 import { CellProps } from "react-table";
 import SimpleBar from "simplebar-react";
+import { fromPairs } from "lodash";
 const Group = () => {
   document.title = "Group | Bouden Coach Travel";
 
@@ -46,6 +48,7 @@ const Group = () => {
   const [deleteGroup] = useDeleteGroupMutation();
   // Mutation to create Group
   const [createGroup] = useAddGroupMutation();
+  const { data: AllPrograms = [] } = useFetchProgramsQuery ();
 
   // group values
 
@@ -59,9 +62,16 @@ const Group = () => {
     dateEnd: "",
     timeEnd: "",
     status: "",
+    program:"",
     id_company: "",
     employees: [{ _id: "", firstName: "", lastName: "", photos: "" }],
   });
+  const [selectedProgram, setSelectedProgram] = useState<string>("");
+  const selectChangeProgram = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedProgram(value);
+  };
+
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -69,6 +79,7 @@ const Group = () => {
     }));
   };
   const onSubmitGroup = (e: React.FormEvent<HTMLFormElement>) => {
+    formData["program"]=selectedProgram
     e.preventDefault();
     formData["employees"] = selectedEmployees;
     createGroup(formData).then(() => setFormData(formData));
@@ -127,7 +138,7 @@ const Group = () => {
   ///// modal and selection stuff
 
   const handleClick = () => {
-    // Navigate to another page
+   
     navigate("/groups");
   };
   const columns = useMemo(
@@ -416,14 +427,29 @@ const Group = () => {
                       />
                     </div>
                   </div>
-                  {/* <div className="col-lg-10">
-                                        <div className="mb-3">
-                                            <label htmlFor="locationSelect" className="form-label">Final Station</label>
-                                            <select className="form-select" name="choices-single-default" id="locationSelect" required>
-                                              
-                                            </select>
-                                        </div>
-                                    </div> */}
+                  <Col lg={6}>
+                                <div className="mb-3">
+                                  <label htmlFor="group" className="form-label">
+                                   Program
+                                  </label>
+                                  <select
+                                    className="form-select text-muted"
+                                    name="choices-single-default"
+                                    id="group"
+                                    onChange={selectChangeProgram}
+                                  >
+                                    <option value="">Select Program</option>
+                                    {AllPrograms.map((program) => (
+                                      <option
+                                        value={program?._id!}
+                                        key={program?._id!}
+                                      >
+                                        {program?.programName}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </Col>
                   <Col lg={12}>
                     <div>
                       <Selection onSelectionChange={handleSelectionChange} />
@@ -487,6 +513,16 @@ const Group = () => {
                     <td>
                       <span className="fw-medium text-uppercase">
                         {showCouponDetails.note}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <span className="text-muted">Program:</span>
+                    </td>
+                    <td>
+                      <span className="fw-medium text-uppercase">
+                        {showCouponDetails.program?.programName!}
                       </span>
                     </td>
                   </tr>

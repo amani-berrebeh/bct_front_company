@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card, Col, Row } from 'react-bootstrap';
+import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import { VectorMap } from '@south-paw/react-vector-maps';
 import world from './world.svg.json';
 
@@ -9,6 +9,9 @@ import avatar2 from 'assets/images/users/avatar-2.jpg'
 const ShippingDetails = () => {
     return (
         <React.Fragment>
+            <Container>
+
+            
             <Card>
                 <Card.Header>
                     <div className="d-flex align-items-center">
@@ -138,6 +141,7 @@ const ShippingDetails = () => {
                     </div>
                 </Card.Body>
             </Card>
+            </Container>
         </React.Fragment>
     );
 };

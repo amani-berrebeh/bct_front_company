@@ -12,6 +12,7 @@ export interface GroupInterface {
     timeEnd: string,
     status: string,
     id_company: string,
+    program:string
     employees: {
       _id: string;
       firstName: string;
