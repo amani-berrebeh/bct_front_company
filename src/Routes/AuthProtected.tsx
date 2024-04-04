@@ -6,30 +6,40 @@ import { useDispatch } from "react-redux";
 import { useProfile } from "Common/Hooks/UserHooks";
 
 import { logoutUser } from "slices/thunk";
+import axios from 'axios';
+import { setCredentials } from "features/account/authSlice";
+
+import Cookies from 'js-cookie';
+
 
 const AuthProtected = (props: any) => {
-  const dispatch = useDispatch<any>();
-  const { userProfile, loading, token } = useProfile();
-  useEffect(() => {
-    if (userProfile && !loading && token) {
-      setAuthorization(token);
-    } else if (!userProfile && loading && !token) {
-      dispatch(logoutUser());
-    }
-  }, [token, userProfile, loading, dispatch]);
+  let token = localStorage.getItem("auth");
 
-  /*
+  const tokenc = Cookies.get('astk');
+
+  console.log(tokenc);
+
+  const dispatch = useDispatch<any>();
+   /*
     Navigate is un-auth access protected routes via url
     */
 
-  if (!userProfile && loading && !token) {
-    return (
-      <Navigate to={{ pathname: "/login" }} />
-    );
-  }
-
-  return <>{props.children}</>;
-};
+    if (!tokenc) {
+      return (
+        <Navigate to={{ pathname: "/login" }} />
+      );
+    }
+  
+    console.log(token);
+    axios.post(`http://localhost:8800/companies/getCompanyByToken`, { token: tokenc })
+    .then((res: any)=> {
+      // console.log(res);
+      dispatch(setCredentials(res));
+    })
+  
+  
+    return <>{props.children}</>;
+  };
 
 const AccessRoute = ({ component: Component, ...rest }: any) => {
   return (

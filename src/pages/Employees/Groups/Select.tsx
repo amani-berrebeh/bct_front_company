@@ -10,8 +10,9 @@ import { useFetchEmployeeQuery, useAddEmployeeMutation, useDeleteEmployeeMutatio
 interface SelectionProps {
   onSelectionChange: (selected: string[]) => void; // Define the onSelectionChange prop
 }
-const Selection: React.FC<SelectionProps> = ({onSelectionChange}) => {
 
+const Selection: React.FC<SelectionProps> = ({onSelectionChange}) => {
+ 
  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [options, setOptions] = useState<{ value: string; label: string; }[]>([]);
   // const [selected, setSelected] =  useState<string[]>([]);
@@ -20,7 +21,7 @@ const Selection: React.FC<SelectionProps> = ({onSelectionChange}) => {
   useEffect(() => {
     if (data) {
    
-      const names = data.map(item => ({ value: item._id, label:item.firstName + item.lastName}));
+      const names:any = data.map(item => ({ value: item._id, label:item.firstName + item.lastName}));
       setOptions(names);
     }
   }, [data]);

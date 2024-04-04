@@ -6,15 +6,22 @@ import Flatpickr from "react-flatpickr";
 import TableContainer from 'Common/TableContainer';
 import { userList } from 'Common/data';
 import Swal from "sweetalert2";
-import { useFetchEmployeeQuery, useAddEmployeeMutation, useDeleteEmployeeMutation, useUpdateEmployeeMutation, Employee } from 'features/employees/employeesSlice';
+import { useFetchEmployeeQuery, useDeleteEmployeeMutation,Employee, useFetchEmployeeByCompanyQuery } from 'features/employees/employeesSlice';
+import { useSelector } from "react-redux";
+import { RootState } from '../../../app/store'; // Import your RootState interface
+import { selectCurrentUser } from '../../../features/account/authSlice'; 
 
 
 const Account = () => {
 
     document.title = "Account | Bouden Coach Travel";
+    
+    const user = useSelector((state: RootState) => selectCurrentUser(state));
+    const { data } = useFetchEmployeeByCompanyQuery({ idCompany: user?._id! });
 
-    const { data = [] } = useFetchEmployeeQuery();
-    console.log(data)
+    // Type assertion to inform TypeScript about the shape of `data`
+    const employees: Employee[] = (data as any)?.getEmployeesByIdCompany || [];  
+    console.log(employees)
     const [deleteEmployee] = useDeleteEmployeeMutation();
 
     const swalWithBootstrapButtons = Swal.mixin({
@@ -26,35 +33,25 @@ const Account = () => {
     });
 
     const AlertDelete = async (_id: any) => {
-        swalWithBootstrapButtons
-            .fire({
-                title: "Are you sure?",
-                text: "You can not step back!",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Yes, Delete it!",
-                cancelButtonText: "No, Cancel!",
-                reverseButtons: true,
-            })
-            .then((result: any) => {
-                if (result.isConfirmed) {
-                    deleteEmployee(_id);
-                    swalWithBootstrapButtons.fire(
-                        "Deleted !",
-                        "Account has been deleted.",
-                        "success"
-                    );
-                } else if (result.dismiss === Swal.DismissReason.cancel) {
-                    swalWithBootstrapButtons.fire(
-                        "Cancel",
-                        "Account secured :)",
-                        "error"
-                    );
-                }
-            });
+        swalWithBootstrapButtons.fire({
+            title: "Are you sure?",
+            text: "You cannot step back!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Delete it!",
+            cancelButtonText: "No, Cancel!",
+            reverseButtons: true,
+        }).then((result: any) => {
+            if (result.isConfirmed) {
+                deleteEmployee(_id);
+                swalWithBootstrapButtons.fire("Deleted!", "Account has been deleted.", "success");
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                swalWithBootstrapButtons.fire("Cancelled", "Account secured :)", "error");
+            }
+        });
     };
-    const navigate = useNavigate();
 
+    const navigate = useNavigate();
     const [modal_AddEmployeeModal, setmodal_AddEmployeeModal] = useState<boolean>(false);
     function tog_AddEmployeeModal() {
         navigate("/employees/account/new-account")
@@ -63,122 +60,123 @@ const Account = () => {
     const columns = useMemo(
         () => [
             {
-                Header: "Employee Name",
-                disableFilters: true,
-                filterable: true,
-                accessor: (employees: Employee) => {
-                    return (<div className="d-flex align-items-center gap-2">
-                        <div className="flex-shrink-0">
-                            <img src={`http://localhost:8800/employeeFiles/${employees.photos}`} alt="" className="avatar-xs rounded-circle user-profile-img" id='photos' />
-                        </div>
-                        <div className="flex-grow-1 ms-2 user_name">{employees.firstName} {employees.lastName}</div>
-                    </div>)
-                }
-            },
-            {
-                Header: "Group",
-                accessor: (employees: any) => {
-                    return (
-                        <div className="flex-grow-1 ms-2 user_name">{employees.groupId?.groupName!} </div>
-                    )
-                },
-                disableFilters: true,
-                filterable: true,
-            },
-            {
-                Header: "Mobile",
-                accessor: "mobile",
-                disableFilters: true,
-                filterable: true,
-            },
-            {
-                Header: "Status",
-                disableFilters: true,
-                filterable: true,
-                accessor: (cellProps: Employee) => {
-                    switch (cellProps.status) {
-                        case "Active":
-                            return (<span className="badge bg-success-subtle text-success"> {cellProps.status}</span>)
-                        case "Inactive":
-                            return (<span className="badge bg-danger-subtle text-danger"> {cellProps.status}</span>)
-
-
-                    }
-                },
-            },
-
+                             Header: "Employee Name",
+                            disableFilters: true,
+                            filterable: true,
+                            accessor: (employee: Employee) => {
+                                return (<div className="d-flex align-items-center gap-2">
+                                    <div className="flex-shrink-0">
+                                        <img src={`http://localhost:8800/employeeFiles/${employee.photos}`} alt="" className="avatar-xs rounded-circle user-profile-img" id='photos' />
+                                    </div>
+                                    <div className="flex-grow-1 ms-2 user_name">{employee.firstName} {employee.lastName}</div>
+                                </div>)
+                            }
+                        },
+                        {
+                            Header: "Group",
+                            accessor: (employee: any) => {
+                                return (
+                                    <div className="flex-grow-1 ms-2 user_name">{employee.groupId?.groupName!} </div>
+                                )
+                            },
+                            disableFilters: true,
+                            filterable: true,
+                        },
+                        {
+                            Header: "Mobile",
+                            accessor: "mobile",
+                            disableFilters: true,
+                            filterable: true,
+                        },
+                        {
+                            Header: "Status",
+                            disableFilters: true,
+                            filterable: true,
+                            accessor: (cellProps: Employee) => {
+                                switch (cellProps.status) {
+                                    case "Active":
+                                        return (<span className="badge bg-success-subtle text-success"> {cellProps.status}</span>)
+                                    case "Inactive":
+                                        return (<span className="badge bg-danger-subtle text-danger"> {cellProps.status}</span>)
             
-            {
-                Header: "Station",
-                accessor: "station",
-                disableFilters: true,
-                filterable: true,
-            },
-           
-          
-            {
-                Header: "Address",
-                accessor: "address",
-                disableFilters: true,
-                filterable: true,
-            },
-
-
-            {
-                Header: "Action",
-                disableFilters: true,
-                filterable: true,
-                accessor: (cellProps: Employee) => {
-                    return (
-                        <ul className="hstack gap-2 list-unstyled mb-0">
-                            <li>
-                                <Link to="/single-account" state={cellProps} className="badge bg-info-subtle text-info view-item-btn"><i className="ph ph-eye" style={{
-                                    transition: "transform 0.3s ease-in-out",
-                                    cursor: "pointer",
-                                    fontSize: "1.5em",
-                                }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1.4)")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1)")
-                                    }></i></Link>
-                            </li>
-                            <li>
-                                <Link to="#" className="badge bg-success-subtle text-success edit-item-btn"><i className="ph ph-pencil-line" style={{
-                                    transition: "transform 0.3s ease-in-out",
-                                    cursor: "pointer",
-                                    fontSize: "1.5em",
-                                }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1.4)")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1)")
-                                    }></i></Link>
-                            </li>
-                            <li>
-                                <Link to="#" className="badge bg-danger-subtle text-danger remove-item-btn" onClick={() => AlertDelete(cellProps._id)}><i className="ph ph-trash" style={{
-                                    transition: "transform 0.3s ease-in-out",
-                                    cursor: "pointer",
-                                    fontSize: "1.5em",
-                                }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1.4)")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.transform = "scale(1)")
-                                    }></i></Link>
-                            </li>
-                        </ul>
-                    )
-                },
-            },
+            
+                                }
+                            },
+                        },
+            
+                        
+                        {
+                            Header: "Station",
+                            accessor: "station",
+                            disableFilters: true,
+                            filterable: true,
+                        },
+                       
+                      
+                        {
+                            Header: "Address",
+                            accessor: "address",
+                            disableFilters: true,
+                            filterable: true,
+                        },
+            
+            
+                        {
+                            Header: "Action",
+                            disableFilters: true,
+                            filterable: true,
+                            accessor: (cellProps: Employee) => {
+                                return (
+                                    <ul className="hstack gap-2 list-unstyled mb-0">
+                                        <li>
+                                            <Link to="/single-account" state={cellProps} className="badge bg-info-subtle text-info view-item-btn"><i className="ph ph-eye" style={{
+                                                transition: "transform 0.3s ease-in-out",
+                                                cursor: "pointer",
+                                                fontSize: "1.5em",
+                                            }}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1.4)")
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1)")
+                                                }></i></Link>
+                                        </li>
+                                        <li>
+                                            <Link to="#" className="badge bg-success-subtle text-success edit-item-btn"><i className="ph ph-pencil-line" style={{
+                                                transition: "transform 0.3s ease-in-out",
+                                                cursor: "pointer",
+                                                fontSize: "1.5em",
+                                            }}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1.4)")
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1)")
+                                                }></i></Link>
+                                        </li>
+                                        <li>
+                                            <Link to="#" className="badge bg-danger-subtle text-danger remove-item-btn" onClick={() => AlertDelete(cellProps._id)}><i className="ph ph-trash" style={{
+                                                transition: "transform 0.3s ease-in-out",
+                                                cursor: "pointer",
+                                                fontSize: "1.5em",
+                                            }}
+                                                onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1.4)")
+                                                }
+                                                onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.transform = "scale(1)")
+                                                }></i></Link>
+                                        </li>
+                                    </ul>
+                                )
+                            },
+                        },
         ],
         []
     );
 
-
+   
+   
     return (
         <React.Fragment>
             <div className="page-content">
@@ -203,7 +201,7 @@ const Account = () => {
                             <div className="table-responsive table-card">
                                 <TableContainer
                                     columns={(columns || [])}
-                                    data={(data || [])}
+                                    data={(employees || [])}
                                     // isGlobalFilter={false}
                                     iscustomPageSize={false}
                                     isBordered={false}

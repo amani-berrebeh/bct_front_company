@@ -21,10 +21,14 @@ import {
   Complain,
   useUpdateComplainToPushedMutation,
   useUpdateComplainToArchivedMutation,
+  useFetchComplainByCompanyQuery,
 } from "features/complains/complainSlice";
 import { pdfjs } from "react-pdf";
 import { Document, Page } from "react-pdf";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { useSelector } from "react-redux";
+import { RootState } from '../../app/store'; 
+import { selectCurrentUser } from '../../features/account/authSlice'; 
 
 const paragraphStyles = {
   WebkitLineClamp: 2,
@@ -53,9 +57,15 @@ const ArchivedComplains = () => {
     });
   }
   document.title = "Complains | Bouden Coach Travel";
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+    const { data } = useFetchComplainByCompanyQuery({ id_corporate: user?._id! });
 
-  const { data = [] } = useFetchComplainQuery();
-  console.log(data);
+    // Type assertion to inform TypeScript about the shape of `data`
+    const complains: Complain[] = (data as any)?.getComplainByIdCompany || [];  
+    console.log(complains)
+
+  // const { data = [] } = useFetchComplainQuery();
+  // console.log(data);
   const [sendResponse] = useUpdateComplainResponseMutation();
   const [addComplain] = useAddComplainMutation();
   const [deleteComplain] = useDeleteComplainMutation();
@@ -119,7 +129,7 @@ const ArchivedComplains = () => {
   useEffect(() => {
     if (selectedComplaintId) {
       // Find the complaint object with the selected _id from the data array
-      const selectedComplaint = data.find(
+      const selectedComplaint = complains.find(
         (complaint) => complaint._id === selectedComplaintId
       );
 
@@ -306,42 +316,65 @@ const ArchivedComplains = () => {
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumb title="Claims" pageTitle="Feedback&Claims" />
+          <Breadcrumb title="Archived Complains" pageTitle="Feedback&Claims" />
           
           <Row>
             <div className="col-12">
               <Row>
-                {data.map((complaint: Complain) => (
+                {complains.map((complaint: Complain) => (
                   <Col xxl={4} key={complaint._id}>
+                    {complaint.archived === "yes" ?(
                     <Card>
                       <Card.Header>
-                        {complaint.archived === "yes" ?(
+                        
                           <>
                             <Button type="button" className="btn btn-danger btn-icon float-end m-1"  onClick={() => deleteClaim(complaint._id)}><i className="ri-delete-bin-5-line"></i></Button>
                               
                             
                             
                           </>
-                         ) :(
-                            <>
-                            </>
-                        )}
+                       {complaint.id_corporate === "" ? (
+                        
+                          <>
+                          <h5 className="card-title mb-0">
+                         <img
+                           src={`http://localhost:8800/employeeFiles/${complaint
+                             ?.id_employee?.photos!}`}
+                           alt=""
+                           className="rounded-5 avatar-sm"
+                         />{" "}
+                         {complaint?.id_employee?.firstName!}{" "}
+                         {complaint?.id_employee?.lastName!}
+                       </h5>
+                       <h6 className="text-muted mt-1">
+                         {complaint?.id_employee?.email!}
+                       </h6>
+                       <h6 className="text-muted mt-1">
+                         {complaint?.id_employee?.mobile!}
+                       </h6>
+                       </>
+                       ):(
+                        <>
+                        
                         <h5 className="card-title mb-0">
-                          <img
-                            src={`http://localhost:8800/employeeFiles/${complaint
-                              ?.id_employee?.photos!}`}
-                            alt=""
-                            className="rounded-5 avatar-sm"
-                          />{" "}
-                          {complaint?.id_employee?.firstName!}{" "}
-                          {complaint?.id_employee?.lastName!}
-                        </h5>
-                        <h6 className="text-muted mt-1">
-                          {complaint?.id_employee?.email!}
-                        </h6>
-                        <h6 className="text-muted mt-1">
-                          {complaint?.id_employee?.mobile!}
-                        </h6>
+                        <img
+                          src={`http://localhost:8800/CompanyFiles/logoFiles/${user.logo_file}`}
+                          alt=""
+                          className="rounded-5 avatar-sm"
+                        />{" "}
+                        {user.account_name}
+                       
+                      </h5>
+                      <h6 className="text-muted mt-1">
+                        {user.email}
+                      </h6>
+                      <h6 className="text-muted mt-1">
+                        {user.phone}
+                      </h6>
+                      </>
+
+                       )}
+                       
                       </Card.Header>
                       <Card.Body key={complaint._id}>
                         <div
@@ -475,6 +508,12 @@ const ArchivedComplains = () => {
                         </Row>
                       </Card.Footer>
                     </Card>
+                      ) :(
+                        <>
+                        
+                        </>
+                    )}
+                 
                   </Col>
                 ))}
               </Row>

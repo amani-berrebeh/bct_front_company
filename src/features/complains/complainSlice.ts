@@ -55,6 +55,16 @@ export const complainSlice = createApi({
           },
           providesTags: ["Complain"],
         }),
+        fetchComplainByCompany: builder.query<Complain[], { id_corporate: string }>({
+          query({ id_corporate }) {
+            return {
+              url: `/getComplainByIdCompany`,
+              method: "POST", 
+              body: { id_corporate }, 
+            };
+          },
+          providesTags: ["Complain"],
+        }),
         addComplain: builder.mutation<void, Complain>({
           query(payload) {
             return {
@@ -132,5 +142,6 @@ export const complainSlice = createApi({
     useUpdateComplainMutation,
     useUpdateComplainResponseMutation,
     useUpdateComplainToPushedMutation,
-    useUpdateComplainToArchivedMutation
+    useUpdateComplainToArchivedMutation,
+    useFetchComplainByCompanyQuery
   } = complainSlice;

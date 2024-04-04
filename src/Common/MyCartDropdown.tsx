@@ -12,18 +12,29 @@ import image3 from "assets/images/products/img-3.png";
 import image6 from "assets/images/products/img-6.png";
 import image5 from "assets/images/products/img-5.png";
 import {
+  Note,
   useDeleteNoteMutation,
   useFetchNoteQuery,
+  useFetchNotesByCompanyQuery,
 } from "features/notes/notesSlice";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import { RootState } from '../app/store'; 
+import { selectCurrentUser } from '../features/account/authSlice'; 
 
 const MyCartDropdown = () => {
   const cartItemTotal: any = useRef();
   const emptyCart: any = useRef();
 
-  const { data = [] } = useFetchNoteQuery();
+  // const { data = [] } = useFetchNoteQuery();
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const { data } = useFetchNotesByCompanyQuery({ id_corporate: user?._id! });
 
-  const notesTotal = data.length;
+  // Type assertion to inform TypeScript about the shape of `data`
+  const notes: Note[] = (data as any)?.getNotesByIdCompany || [];  
+  console.log(notes)
+
+  const notesTotal = notes.length;
 
   console.log(data);
   const [deleteNote] = useDeleteNoteMutation();
@@ -37,7 +48,7 @@ const MyCartDropdown = () => {
   // ];
 
   // const [cartItem, setCartItem] = useState(cartData.length);
-  const [cartItem, setCartItem] = useState(data.length);
+  const [cartItem, setCartItem] = useState(notes.length);
 
   //   const removeItem = (ele: any) => {
   //     var price = ele
@@ -165,7 +176,7 @@ const MyCartDropdown = () => {
                   Write New One
                 </Link>
               </div>
-              {data.map((item, key) => (
+              {notes.map((item, key) => (
                 <div
                   className="d-block dropdown-item dropdown-item-cart text-wrap px-3 py-2"
                   key={item._id}

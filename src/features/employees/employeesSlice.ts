@@ -1,10 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Employee {
-    _id:string,
+    _id?:string,
     firstName:string,
     lastName:string,
-    idCompany: string,
+    idCompany?: string,
     civilStatus:string,
     gender: string,
     address: string,
@@ -41,6 +41,18 @@ export const employeeSlice = createApi({
         },
         providesTags: ["Employee"],
       }),
+
+      fetchEmployeeByCompany: builder.query<Employee[], { idCompany: string }>({
+        query({ idCompany }) {
+          return {
+            url: `/getemployeesbyIdCompany`,
+            method: "POST", 
+            body: { idCompany }, 
+          };
+        },
+        providesTags: ["Employee"],
+      }),
+
       addEmployee: builder.mutation<void, Employee>({
         query(payload) {
           return {
@@ -51,6 +63,7 @@ export const employeeSlice = createApi({
         },
         invalidatesTags: ["Employee"],
       }),
+
       updateEmployee: builder.mutation<void, Employee>({
         query: ({ _id, ...rest }) => ({
           url: `/updateEmployee/${_id}`,
@@ -59,6 +72,7 @@ export const employeeSlice = createApi({
         }),
         invalidatesTags: ["Employee"],
       }),
+
       deleteEmployee: builder.mutation<void, number>({
         query: (_id) => ({
           url: `deleteEmployee/${_id}`,
@@ -75,4 +89,5 @@ export const {
   useFetchEmployeeQuery,
   useDeleteEmployeeMutation,
   useUpdateEmployeeMutation,
+  useFetchEmployeeByCompanyQuery
 } = employeeSlice;

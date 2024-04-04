@@ -26,9 +26,12 @@ import { useFetchProgramsQuery } from "features/program/programSlice";
 import { CellProps } from "react-table";
 import SimpleBar from "simplebar-react";
 import { fromPairs } from "lodash";
+import { useSelector } from "react-redux";
+import { RootState } from '../../../app/store'; // Import your RootState interface
+import { selectCurrentUser } from '../../../features/account/authSlice'; 
 const Group = () => {
   document.title = "Group | Bouden Coach Travel";
-
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
   const [modal_AddShippingModals, setmodal_AddShippingModals] =
     useState<boolean>(false);
   function tog_AddShippingModals() {
@@ -63,7 +66,7 @@ const Group = () => {
     timeEnd: "",
     status: "",
     program:"",
-    id_company: "",
+    id_company: user?._id!,
     employees: [{ _id: "", firstName: "", lastName: "", photos: "" }],
   });
   const [selectedProgram, setSelectedProgram] = useState<string>("");

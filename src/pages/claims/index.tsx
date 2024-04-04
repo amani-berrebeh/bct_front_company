@@ -20,11 +20,15 @@ import {
   useUpdateComplainResponseMutation,
   Complain,
   useUpdateComplainToPushedMutation,
-  useUpdateComplainToArchivedMutation,
+  useUpdateComplainToArchivedMutation,useFetchComplainByCompanyQuery
 } from "features/complains/complainSlice";
 import { pdfjs } from "react-pdf";
 import { Document, Page } from "react-pdf";
 import "@react-pdf-viewer/core/lib/styles/index.css";
+import { useSelector } from "react-redux";
+import { RootState } from '../../app/store'; 
+import { selectCurrentUser } from '../../features/account/authSlice'; 
+
 
 const paragraphStyles = {
   WebkitLineClamp: 2,
@@ -54,8 +58,12 @@ const Claims = () => {
   }
   document.title = "Complains | Bouden Coach Travel";
 
-  const { data = [] } = useFetchComplainQuery();
-  console.log(data);
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+    const { data } = useFetchComplainByCompanyQuery({ id_corporate: user?._id! });
+
+    // Type assertion to inform TypeScript about the shape of `data`
+    const complains: Complain[] = (data as any)?.getComplainByIdCompany || [];  
+    console.log(complains)
   const [sendResponse] = useUpdateComplainResponseMutation();
   const [addComplain] = useAddComplainMutation();
   const [deleteComplain] = useDeleteComplainMutation();
@@ -69,7 +77,7 @@ const Claims = () => {
   setSelectedStatus(event.target.value);
 };
  // Function to filter data based on the selected status
- const filteredData = data.filter((complaint) => {
+ const filteredData = complains.filter((complaint) => {
   if (selectedStatus === '') {
     return complaint.archived !== 'yes'; // Show complaints that are not archived
   } else {
@@ -196,7 +204,7 @@ const Claims = () => {
   const [formData, setFormData] = useState({
     _id: "",
     responseMessage: "",
-    id_corporate: "",
+    id_corporate: user?._id!,
     id_student: "",
     id_parent: "",
     subject: "",
@@ -245,7 +253,7 @@ const Claims = () => {
   useEffect(() => {
     if (selectedComplaintId) {
       // Find the complaint object with the selected _id from the data array
-      const selectedComplaint = data.find(
+      const selectedComplaint = complains.find(
         (complaint) => complaint._id === selectedComplaintId
       );
 
@@ -667,7 +675,47 @@ const Claims = () => {
                             )}
                           </Link>
                         )}
-                        <h5 className="card-title mb-0">
+
+                        {complaint.id_corporate===""?(
+                            <>
+                           <h5 className="card-title mb-0">
+                           <img
+                             src={`http://localhost:8800/employeeFiles/${complaint
+                               ?.id_employee?.photos!}`}
+                             alt=""
+                             className="rounded-5 avatar-sm"
+                           />{" "}
+                           {complaint?.id_employee?.firstName!}{" "}
+                           {complaint?.id_employee?.lastName!}
+                         </h5>
+                         <h6 className="text-muted mt-1">
+                           {complaint?.id_employee?.email!}
+                         </h6>
+                         <h6 className="text-muted mt-1">
+                           {complaint?.id_employee?.mobile!}
+                         </h6>
+                         </>
+                        ):(
+                          <>
+                          <h5 className="card-title mb-0">
+                          <img
+                            src={`http://localhost:8800/CompanyFiles/logoFiles/${user.logo_file}`}
+                            alt=""
+                            className="rounded-5 avatar-sm"
+                          />{" "}
+                          {user.account_name}
+                         
+                        </h5>
+                        <h6 className="text-muted mt-1">
+                          {user.email}
+                        </h6>
+                        <h6 className="text-muted mt-1">
+                          {user.phone}
+                        </h6>
+                        </>
+
+                        )}
+                        {/* <h5 className="card-title mb-0">
                           <img
                             src={`http://localhost:8800/employeeFiles/${complaint
                               ?.id_employee?.photos!}`}
@@ -682,7 +730,7 @@ const Claims = () => {
                         </h6>
                         <h6 className="text-muted mt-1">
                           {complaint?.id_employee?.mobile!}
-                        </h6>
+                        </h6> */}
                       </Card.Header>
                       <Card.Body key={complaint._id}>
                         <div

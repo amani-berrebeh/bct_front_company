@@ -5,6 +5,7 @@ export interface Note {
     title: string,
   message: string,
   pdf:string,
+  id_corporate:string,
   pdfBase64String:string,
   pdfExtension:string,
   photo:string,
@@ -22,6 +23,16 @@ export const noteSlice = createApi({
         fetchNote: builder.query<Note[], number | void>({
           query() {
             return `/getAllNotes`;
+          },
+          providesTags: ["Note"],
+        }),
+        fetchNotesByCompany: builder.query<Note[], { id_corporate: string }>({
+          query({ id_corporate }) {
+            return {
+              url: `/getNotesByIdCompany`,
+              method: "POST", 
+              body: { id_corporate }, 
+            };
           },
           providesTags: ["Note"],
         }),
@@ -59,4 +70,5 @@ export const noteSlice = createApi({
     useFetchNoteQuery,
     useDeleteNoteMutation,
     useUpdateNoteMutation,
+    useFetchNotesByCompanyQuery
   } = noteSlice;

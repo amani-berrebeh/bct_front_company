@@ -22,6 +22,9 @@ import { useAddEmployeeMutation } from "features/employees/employeesSlice";
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 import { useFetchGroupQuery } from "features/groups/groupsSlice";
+import { useSelector } from "react-redux";
+import { RootState } from '../../../app/store'; // Import your RootState interface
+import { selectCurrentUser } from '../../../features/account/authSlice'; 
 
 const AddNewAccount = () => {
   document.title = "create Account | Bouden Coach Travel";
@@ -30,12 +33,14 @@ const AddNewAccount = () => {
   // Mutation to create account
   const [createAccount] = useAddEmployeeMutation();
   const { data: AllGroups = [] } = useFetchGroupQuery();
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+
   // Account's Values and Functions
   const [formData, setFormData] = useState({
     _id: "",
     firstName: "",
     lastName: "",
-    idCompany: "",
+    idCompany: user?._id!,
     gender: "",
     civilStatus: "",
     address: "",

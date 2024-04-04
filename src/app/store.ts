@@ -13,6 +13,9 @@ import { groupSlice } from "features/groups/groupsSlice";
 import { complainSlice } from "features/complains/complainSlice";
 import { programSlice } from "features/program/programSlice";
 import { noteSlice } from "features/notes/notesSlice";
+import { accountSlice } from "features/account/accountSlice";
+import authSlice from "features/account/authSlice";
+
 export const store = configureStore({
   reducer: {
     [employeeSlice.reducerPath]: employeeSlice.reducer,
@@ -20,6 +23,8 @@ export const store = configureStore({
     [complainSlice.reducerPath]:complainSlice.reducer,
     [noteSlice.reducerPath]:noteSlice.reducer,
     [programSlice.reducerPath]: programSlice.reducer,
+    [accountSlice.reducerPath]: accountSlice.reducer,
+    auth: authSlice,
     Layout: LayoutReducer,
     ForgetPassword: ForgetPasswordReducer,
     Profile: ProfileReducer,
@@ -27,7 +32,7 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware().concat([
-        employeeSlice.middleware, groupSlice.middleware, complainSlice.middleware, noteSlice.middleware, programSlice.middleware
+        employeeSlice.middleware, groupSlice.middleware, complainSlice.middleware, noteSlice.middleware, programSlice.middleware, accountSlice.middleware
     ]);
   },
 });

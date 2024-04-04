@@ -20,7 +20,9 @@ import SimpleBar from "simplebar-react";
 import { productDelivery } from "Common/data";
 import { useAddNoteMutation } from "features/notes/notesSlice";
 import Swal from "sweetalert2";
-
+import { useSelector } from "react-redux";
+import { RootState } from '../../app/store'; 
+import { selectCurrentUser } from '../../features/account/authSlice'; 
 const Status = ({ status }: any) => {
   switch (status) {
     case "Successful":
@@ -35,6 +37,11 @@ const Status = ({ status }: any) => {
 };
 
 const ModalNote = () => {
+
+
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+
+
   const navigate = useNavigate();
   const [paymentDetails, setPaymentDetails] = useState<any>({});
 
@@ -50,6 +57,7 @@ const ModalNote = () => {
     _id: "",
     title: "",
     message: "",
+    id_corporate:user?._id!,
     pdf: "",
     pdfBase64String: "",
     pdfExtension: "",

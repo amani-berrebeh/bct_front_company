@@ -89,13 +89,11 @@ import ProgramDetails from "pages/Programming/programList/ProgramDetails";
 import AddProgramm from "pages/Programming/Programs";
 import ProgramDetail from "pages/Programming/programList/ProgramDetail";
 import ArchivedComplains from "pages/claims/ArchivedComplains";
+import Login from "pages/Authentication/Login";
+
 
 
 const authProtectedRoutes = [
-  
-];
-
-const publicRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
 
   //? Tracking
@@ -169,6 +167,16 @@ const publicRoutes = [
   { path: "*", component: <Navigate to="/tracking" /> },
   { path: "/user-profile", component: <UserProfile /> },
   // AuthenticationInner
+
+
+
+
+
+
+];
+
+const publicRoutes = [
+  { path: "/login", component: <Login /> },
   { path: "/auth-signin-basic", component: <SignIn /> },
   { path: "/auth-pass-reset-basic", component: <PasswordReset /> },
   { path: "/auth-pass-change-basic", component: <PasswordCreate /> },
@@ -180,4 +188,7 @@ const publicRoutes = [
   { path: "/coming-soon", component: <ComingSoon /> },
 ];
 
-export { publicRoutes };
+
+
+
+export { publicRoutes, authProtectedRoutes };
