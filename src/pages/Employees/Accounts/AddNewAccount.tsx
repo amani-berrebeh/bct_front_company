@@ -36,6 +36,7 @@ const AddNewAccount = () => {
   const user = useSelector((state: RootState) => selectCurrentUser(state));
 
   // Account's Values and Functions
+  // groupId: "65def391137b93f458f52c1f",
   const [formData, setFormData] = useState({
     _id: "",
     firstName: "",
@@ -51,7 +52,8 @@ const AddNewAccount = () => {
     dateOfBirth: "",
     legalcard: "",
     username: "",
-    groupId: "65def391137b93f458f52c1f",
+    groupId: null,
+    groupJoiningDate:"",
     login: "",
     password: "",
     photosBase64String: "",
@@ -101,10 +103,10 @@ const AddNewAccount = () => {
   //change group
   const [selectedGroup, setSelectedGroup] = useState<string>("");
 
-  const selectChangeGroup = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedGroup(value);
-  };
+  // const selectChangeGroup = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const value = event.target.value;
+  //   setSelectedGroup(value);
+  // };
 
   const handleDateChange = (selectedDates: Date[]) => {
     // Assuming you only need the first selected date
@@ -115,11 +117,11 @@ const AddNewAccount = () => {
     formData["gender"] = selectedOption;
     formData["civilStatus"] = selectedStatus;
     formData["station"] = selectedStation;
-    if (selectedGroup === "") {
-      formData["groupId"] = "65def391137b93f458f52c1f";
-    } else {
-      formData["groupId"] = selectedGroup;
-    }
+    // if (selectedGroup === "") {
+    //   formData["groupId"] = "65def391137b93f458f52c1f";
+    // } else {
+    //   formData["groupId"] = selectedGroup;
+    // }
 
     formData["nationality"] = seletedCountry1.countryName;
     // formData["dateOfBirth"] = selectedDate!.toDateString();
@@ -724,7 +726,7 @@ const AddNewAccount = () => {
                                   </select>
                                 </div>
                               </Col> */}
-                              <Col lg={2}>
+                              {/* <Col lg={2}>
                                 <div className="mb-3">
                                   <label htmlFor="group" className="form-label">
                                     Group
@@ -746,7 +748,7 @@ const AddNewAccount = () => {
                                     ))}
                                   </select>
                                 </div>
-                              </Col>
+                              </Col> */}
                               {/* <Col lg={2}>
                                 <div className="mb-3">
                                   <label

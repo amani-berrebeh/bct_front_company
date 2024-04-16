@@ -17,11 +17,14 @@ const Selection: React.FC<SelectionProps> = ({onSelectionChange}) => {
   const [options, setOptions] = useState<{ value: string; label: string; }[]>([]);
   // const [selected, setSelected] =  useState<string[]>([]);
   const { data = [] } = useFetchEmployeeQuery();
+  const filteredEmployees = data.filter(employee => employee.groupId === null);
+
+
 
   useEffect(() => {
-    if (data) {
+    if (filteredEmployees) {
    
-      const names:any = data.map(item => ({ value: item._id, label:item.firstName + item.lastName}));
+      const names:any = filteredEmployees.map(item => ({ value: item._id, label:item.firstName + item.lastName}));
       setOptions(names);
     }
   }, [data]);

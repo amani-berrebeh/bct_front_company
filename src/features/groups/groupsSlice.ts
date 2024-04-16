@@ -15,10 +15,17 @@ export interface GroupInterface {
     program:string
     employees: {
       _id: string;
-      firstName: string;
-      lastName: string;
-      photos:string
+      firstName: string,
+      lastName: string,
+      photos:string,
+      groupId?:string,
+      groupJoiningDate?:string
   }[];
+}
+
+export interface AddEmployeesToGroupInterface {
+  _id?:string,
+  employees: string[]
 }
 
 export const groupSlice = createApi({
@@ -26,7 +33,7 @@ export const groupSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:8800/groupEmployee/",
   }),
-  tagTypes: ["Group"],
+  tagTypes: ["Group", "AddEmployeesToGroupInterface"],
   endpoints(builder) {
     return {
       fetchGroup: builder.query<GroupInterface[], number | void>({
@@ -44,6 +51,14 @@ export const groupSlice = createApi({
           };
         },
         invalidatesTags: ["Group"],
+      }),
+      addEmployeesToGroup: builder.mutation<void, AddEmployeesToGroupInterface>({
+        query: ({ _id, employees }) => ({
+          url: "/addEmployeesToGroup",
+          method: "POST",
+          body: { _id, employees }, 
+        }),
+        invalidatesTags: ["Group", "AddEmployeesToGroupInterface"], 
       }),
       updateGroup: builder.mutation<void, GroupInterface>({
         query: ({ _id, ...rest }) => ({
@@ -69,4 +84,5 @@ export const {
   useFetchGroupQuery,
   useDeleteGroupMutation,
   useUpdateGroupMutation,
+  useAddEmployeesToGroupMutation
 } = groupSlice;

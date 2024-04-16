@@ -90,7 +90,7 @@ const Login = (props: any) => {
       showConfirmButton: false,
       timer: 2200,
     });
-    navigate("/");
+    navigate("/dashboard");
   };
 
   const msgError: string =

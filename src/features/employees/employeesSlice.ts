@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Employee {
-    _id?:string,
+    _id:string,
     firstName:string,
     lastName:string,
     idCompany?: string,
@@ -15,7 +15,8 @@ export interface Employee {
     dateOfBirth: string,
     legalcard: string,
     username: string,
-    groupId?:string,
+    groupId?:string | null ,
+    groupJoiningDate:string | null ,
     login: string,
     password:string,
     legalcardExtension: string,
@@ -24,7 +25,8 @@ export interface Employee {
     photosExtension: string,
     positionTitle:string,
     nationality:string,
-    status:string
+    status:string,
+
 }
 
 export const employeeSlice = createApi({
@@ -80,6 +82,14 @@ export const employeeSlice = createApi({
         }),
         invalidatesTags: ["Employee"],
       }),
+      removeEmployeeFromGroup : builder.mutation<void, { employeeId: string, groupId: string }>({
+        query: ({ employeeId, groupId }) => ({
+          url: `employees/${employeeId}/groups/${groupId}`,
+          method: 'DELETE',
+        }),
+        invalidatesTags: ['Employee'],
+      }),
+
     };
   },
 });
@@ -89,5 +99,6 @@ export const {
   useFetchEmployeeQuery,
   useDeleteEmployeeMutation,
   useUpdateEmployeeMutation,
-  useFetchEmployeeByCompanyQuery
+  useFetchEmployeeByCompanyQuery,
+  useRemoveEmployeeFromGroupMutation
 } = employeeSlice;
