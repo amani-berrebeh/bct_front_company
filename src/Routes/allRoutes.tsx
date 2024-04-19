@@ -72,7 +72,7 @@ import Station from "pages/Programming/Station";
 import GoogleMap from "pages/Tracking/map-tracking";
 import Claim from "pages/claims";
 import ClaimDetails from "pages/claims/claimDetails";
-import Contract from "pages/Contracts";
+
 import ContractDetails from "pages/Contracts/ContractDetails";
 import EmployeePayment from "pages/Payment/employee";
 import TripsManagement from "pages/management";
@@ -90,6 +90,7 @@ import AddProgramm from "pages/Programming/Programs";
 import ProgramDetail from "pages/Programming/programList/ProgramDetail";
 import ArchivedComplains from "pages/claims/ArchivedComplains";
 import Login from "pages/Authentication/Login";
+import Contract from "pages/Contracts";
 
 
 
@@ -159,8 +160,8 @@ const authProtectedRoutes = [
 { path: "/claim-detail", component: <ClaimDetails/> },
 { path: "/complains/archive", component: <ArchivedComplains /> },
  //? Contract
- { path: "/contracts", component: <Contract /> },
-{ path: "/contract-detail", component: <ContractDetails/> },
+ { path: "/contract", component: <Contract /> },
+{ path: "/contract/:id", component: <ContractDetails/> },
   // this route should be at the end of all other routes
   // eslint-disable-next-line react/display-name
   { path: "/", exact: true, component: <Navigate to="/tracking" /> },

@@ -91,8 +91,8 @@ const MyCartDropdown = () => {
         if (result.isConfirmed) {
           deleteNote(_id);
           swalWithBootstrapButtons.fire({
-            title: "Archived!",
-            text: "Your file has been archived.",
+            title: "DELETE!",
+            text: "Your note has been deleted.",
             icon: "success",
           });
         } else if (
@@ -101,7 +101,7 @@ const MyCartDropdown = () => {
         ) {
           swalWithBootstrapButtons.fire({
             title: "Cancelled",
-            text: "Your complain is safe :)",
+            text: "Your note is safe :)",
             icon: "error",
           });
         }

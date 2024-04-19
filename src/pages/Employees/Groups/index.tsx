@@ -52,7 +52,10 @@ interface Employee {
   dateOfBirth: string;
   legalcard: string;
   username: string;
-  groupId?: string | null;
+  groupId?:{
+    _id?:string| null,
+    groupName: string,
+  },
   groupJoiningDate: string | null;
   login: string;
   password: string;

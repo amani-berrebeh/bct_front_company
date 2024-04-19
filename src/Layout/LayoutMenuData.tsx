@@ -142,7 +142,7 @@ const Navdata = () => {
             subItems: [
                 { id: "level1.1", label: "Add Program", link: "/programming/addProgram", icon: "bi bi-truck-front", parentId: "Programming" },
                 { id: "level1.2", label: "List of Programs", link: "/programming/list-of-programs", icon: "mdi mdi-bus-stop-uncovered", parentId: "Programming" },
-                { id: "Contracts",label: "Contracts",icon: "bi bi-pencil-square",link: "/contracts"},
+                { id: "Contracts",label: "Contracts",icon: "bi bi-pencil-square",link: "/contract"},
                 { id: "level1.5", label: "Offers", link: "/offers", icon: "bi bi-megaphone", parentId: "Programming" },
                 // { id: "level1.3", label: "Trip & management", link: "/#",icon: "bi bi-calendar-week", parentId: "Programming" },
                 // { id: "level1.4", label: "Scheduling", link: "/extra-trips", icon: "bi bi-calendar3", parentId: "Programming" },

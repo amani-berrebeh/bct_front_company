@@ -52,7 +52,10 @@ const AddNewAccount = () => {
     dateOfBirth: "",
     legalcard: "",
     username: "",
-    groupId: null,
+    groupId:{
+      _id:null,
+      groupName:" ",
+    },
     groupJoiningDate:"",
     login: "",
     password: "",
